@@ -49,3 +49,6 @@ export const IconTable = () => (
 export const IconEdit = () => (
   <svg {...base} width={18} height={18}><path d="M4 20h4L19 9l-4-4L4 16v4Z" /><path d="m13 7 4 4" /></svg>
 );
+export const IconFolder = () => (
+  <svg {...base}><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" /></svg>
+);

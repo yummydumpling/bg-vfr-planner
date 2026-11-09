@@ -30,6 +30,11 @@ interface RouteState {
   setWind: (w: RouteWind) => void;
   setCruiseAlt: (ft: number) => void;
   setAlternates: (a: string[]) => void;
+  setName: (name: string) => void;
+  /** Replace the working route (from the library or an import). */
+  loadRoute: (r: Partial<Route> & Pick<Route, 'waypoints'>) => void;
+  /** Start an empty route. */
+  newRoute: () => void;
 }
 
 export const DEFAULT_CRUISE_ALT_FT = 3500;
@@ -73,6 +78,9 @@ export const useRoute = create<RouteState>()(
         reverse: () => edit((l) => (l.length > 1 ? ops.reverseRoute(l) : l)),
         clear: () => edit((l) => (l.length ? [] : l)),
         setWind: (wind) => set((s) => ({ route: { ...s.route, wind, updatedAt: new Date().toISOString() } })),
+        setName: (name) => set((s) => ({ route: { ...s.route, name, updatedAt: new Date().toISOString() } })),
+        loadRoute: (r) => set({ route: { ...emptyRoute(), ...structuredClone(r) }, past: [], selectedWp: null }),
+        newRoute: () => set({ route: emptyRoute(), past: [], selectedWp: null }),
         setAlternates: (alternates) => set((s) => ({ route: { ...s.route, alternates, updatedAt: new Date().toISOString() } })),
         setCruiseAlt: (cruiseAltFt) => set((s) => ({ route: { ...s.route, cruiseAltFt, updatedAt: new Date().toISOString() } })),
         undo: () => {

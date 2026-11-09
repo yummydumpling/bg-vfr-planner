@@ -1,8 +1,8 @@
 import { useT } from '../i18n';
 import { useSettings } from '../store/settings';
-import { IconLayers, IconMoon, IconSun, IconTable } from './icons';
+import { IconFolder, IconLayers, IconMoon, IconSun, IconTable } from './icons';
 
-export function TopBar({ onLayers, onNavLog }: { onLayers: () => void; onNavLog: () => void }) {
+export function TopBar({ onLayers, onNavLog, onRoutes }: { onLayers: () => void; onNavLog: () => void; onRoutes: () => void }) {
   const t = useT();
   const { lang, setLang, theme, setTheme } = useSettings();
   return (
@@ -27,6 +27,9 @@ export function TopBar({ onLayers, onNavLog }: { onLayers: () => void; onNavLog:
           title={theme === 'dark' ? t.themeLight : t.themeDark}
         >
           {theme === 'dark' ? <IconSun /> : <IconMoon />}
+        </button>
+        <button className="btn-icon" onClick={onRoutes} aria-label={t.myRoutes} title={t.myRoutes}>
+          <IconFolder />
         </button>
         <button className="btn-icon" onClick={onNavLog} aria-label={t.navlog} title={t.navlog}>
           <IconTable />

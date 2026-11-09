@@ -367,7 +367,7 @@ table.navlog tfoot .sticky-col { background: var(--surface-2); }
   margin: 0 16px 6px; align-self: flex-start; border: 0; background: none; color: var(--route);
   font-weight: 700; font-size: 14px; min-height: 36px; cursor: pointer; padding: 0;
 }
-@media (max-width: 360px) { .brand-name { display: none; } }
+@media (max-width: 420px) { .brand-name { display: none; } .topbar-actions .btn-icon { min-width: 42px; padding: 0 6px; } }
 
 .update-bar {
   position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 9;
@@ -507,3 +507,17 @@ table.navlog tfoot .sticky-col { background: var(--surface-2); }
 .cat-MVFR { background: #1c7ed6; }
 .cat-IFR { background: #e03131; }
 .cat-LIFR { background: #ae3ec9; }
+
+/* ---------- Route library ---------- */
+.lib { max-width: 760px; }
+.lib h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin: 18px 0 4px; }
+.warn-text { color: #e67700; }
+.ok-text { color: #2b8a3e; font-weight: 600; font-size: 14px; }
+:root[data-theme='dark'] .ok-text { color: #8ce99a; }
+.lib-list { list-style: none; margin: 6px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lib-list li { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 4px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.lib-list li.current { border-color: var(--route); }
+.lib-main { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border: 0; background: none; padding: 6px 8px; text-align: left; cursor: pointer; }
+.lib-name { font-weight: 700; font-size: 15.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.lib-btns { display: flex; align-items: center; gap: 4px; flex: none; }
+.btn-copy.danger { color: #fff; background: #e03131; border-color: #e03131; }

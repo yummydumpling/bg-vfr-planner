@@ -10,6 +10,7 @@ import { LayersPanel } from './ui/LayersPanel';
 import { NavLogPanel } from './ui/NavLogPanel';
 import { PrintView } from './ui/PrintView';
 import { RouteButton, RoutePanel } from './ui/RoutePanel';
+import { RoutesPanel } from './ui/RoutesPanel';
 import { TopBar } from './ui/TopBar';
 import { UpdateBar } from './ui/UpdateBar';
 
@@ -22,6 +23,7 @@ export default function App() {
   const error = useData((s) => s.error);
   const [layersOpen, setLayersOpen] = useState(false);
   const [navLogOpen, setNavLogOpen] = useState(false);
+  const [routesOpen, setRoutesOpen] = useState(false);
   const [printing, setPrinting] = useState(false);
 
   // Render the print document, open the print dialog, then remove it again.
@@ -54,7 +56,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <TopBar onLayers={() => setLayersOpen((o) => !o)} onNavLog={() => setNavLogOpen((o) => !o)} />
+      <TopBar onLayers={() => setLayersOpen((o) => !o)} onNavLog={() => { setRoutesOpen(false); setNavLogOpen((o) => !o); }} onRoutes={() => { setNavLogOpen(false); setRoutesOpen((o) => !o); }} />
       <main className="main">
         <MapView />
         <UpdateBar />
@@ -64,6 +66,7 @@ export default function App() {
         <RouteButton />
         <RoutePanel onNavLog={() => setNavLogOpen(true)} />
         <InfoSheet />
+        {routesOpen && <RoutesPanel onClose={() => setRoutesOpen(false)} />}
         {navLogOpen && <NavLogPanel onClose={() => setNavLogOpen(false)} onPrint={() => setPrinting(true)} />}
       </main>
       <DisclaimerBar />
