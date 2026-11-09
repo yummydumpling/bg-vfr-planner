@@ -68,6 +68,9 @@ export const LAYER_IDS = {
   asLineDash: 'aero-as-line-dash',
   asLabel: 'aero-as-label',
   asHighlight: 'aero-as-highlight',
+  asHlFill: 'aero-as-hl-fill',
+  asHlCasing: 'aero-as-hl-casing',
+  asHlLabel: 'aero-as-hl-label',
   airports: 'aero-airports',
   reporting: 'aero-reporting',
   navaids: 'aero-navaids',
@@ -133,12 +136,21 @@ export function addAeroLayers(
       'line-opacity': 0.95,
     },
   });
+  // Highlight of airspaces at a tapped point: own colour, focused one filled.
+  const NONE: maplibregl.FilterSpecification = ['in', ['get', 'id'], ['literal', []]];
   map.addLayer({
-    id: LAYER_IDS.asHighlight,
-    type: 'line',
-    source: 'aero-airspaces',
-    filter: ['in', ['get', 'id'], ['literal', []]],
-    paint: { 'line-color': theme === 'dark' ? '#ffe066' : '#f08c00', 'line-width': 4, 'line-opacity': 0.9 },
+    id: LAYER_IDS.asHlFill, type: 'fill', source: 'aero-airspaces', filter: NONE,
+    paint: { 'fill-color': color, 'fill-opacity': 0.32 },
+  });
+  map.addLayer({
+    id: LAYER_IDS.asHlCasing, type: 'line', source: 'aero-airspaces', filter: NONE,
+    layout: { 'line-join': 'round' },
+    paint: { 'line-color': text.halo, 'line-width': 6 },
+  });
+  map.addLayer({
+    id: LAYER_IDS.asHighlight, type: 'line', source: 'aero-airspaces', filter: NONE,
+    layout: { 'line-join': 'round' },
+    paint: { 'line-color': color, 'line-width': 3 },
   });
   map.addLayer({
     id: LAYER_IDS.asLabel,
@@ -156,6 +168,33 @@ export function addAeroLayers(
       'text-max-angle': 30,
     },
     paint: { 'text-color': color, 'text-halo-color': text.halo, 'text-halo-width': 1.4 },
+  });
+
+  map.addLayer({
+    id: LAYER_IDS.asHlLabel, type: 'symbol', source: 'aero-airspaces', filter: NONE,
+    layout: {
+      'symbol-placement': 'line',
+      'symbol-spacing': 220,
+      'text-field': ['concat', ['get', 'name'], '  ', ['get', 'lowerTxt'], ' – ', ['get', 'upperTxt']],
+      'text-font': FONT_BOLD,
+      'text-size': 12.5,
+      'text-offset': [0, 1],
+      'text-max-angle': 35,
+    },
+    paint: { 'text-color': color, 'text-halo-color': text.halo, 'text-halo-width': 2 },
+  });
+  map.addSource('aero-tap', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  map.addLayer({
+    id: 'aero-tap-ring', type: 'circle', source: 'aero-tap',
+    paint: { 'circle-radius': 11, 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': text.halo, 'circle-stroke-width': 6 },
+  });
+  map.addLayer({
+    id: 'aero-tap-dot', type: 'circle', source: 'aero-tap',
+    paint: { 'circle-radius': 11, 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': text.color, 'circle-stroke-width': 2.5 },
+  });
+  map.addLayer({
+    id: 'aero-tap-center', type: 'circle', source: 'aero-tap',
+    paint: { 'circle-radius': 3, 'circle-color': text.color },
   });
 
   map.addLayer({
@@ -238,7 +277,30 @@ export function updateLayerVisibility(map: maplibregl.Map, layers: Record<LayerK
   map.setLayoutProperty(LAYER_IDS.navaids, 'visibility', vis(layers.navaids));
 }
 
-export function setHighlightedAirspaces(map: maplibregl.Map, ids: string[]) {
+export interface AirspaceHighlight {
+  ids: string[];
+  /** The airspace selected in the list: filled and drawn thicker. */
+  focusId?: string;
+  /** The tapped point. */
+  point?: { lat: number; lon: number };
+}
+
+export function setHighlightedAirspaces(map: maplibregl.Map, hl: AirspaceHighlight | null) {
   if (!map.getLayer(LAYER_IDS.asHighlight)) return;
-  map.setFilter(LAYER_IDS.asHighlight, ['in', ['get', 'id'], ['literal', ids]]);
+  const ids = hl?.ids ?? [];
+  const focus = hl?.focusId ?? '';
+  const inIds: maplibregl.FilterSpecification = ['in', ['get', 'id'], ['literal', ids]];
+  const isFocus: Expr = ['==', ['get', 'id'], focus];
+  map.setFilter(LAYER_IDS.asHlFill, ['==', ['get', 'id'], focus]);
+  map.setFilter(LAYER_IDS.asHlCasing, inIds);
+  map.setFilter(LAYER_IDS.asHighlight, inIds);
+  map.setFilter(LAYER_IDS.asHlLabel, inIds);
+  map.setPaintProperty(LAYER_IDS.asHighlight, 'line-width', ['case', isFocus, 5, 2.5]);
+  map.setPaintProperty(LAYER_IDS.asHlCasing, 'line-width', ['case', isFocus, 9, 5.5]);
+  map.setPaintProperty(LAYER_IDS.asHlLabel, 'text-opacity', ['case', isFocus, 1, 0.75]);
+  const tap = map.getSource('aero-tap') as maplibregl.GeoJSONSource | undefined;
+  tap?.setData({
+    type: 'FeatureCollection',
+    features: hl?.point ? [{ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [hl.point.lon, hl.point.lat] } }] : [],
+  });
 }

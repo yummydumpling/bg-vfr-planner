@@ -40,7 +40,7 @@ export function RouteButton() {
 export function RoutePanel({ onNavLog }: { onNavLog: () => void }) {
   const t = useT();
   const { route, planning, selectedWp, past } = useRoute();
-  const { setPlanning, selectWp, remove, reorder, reverse, clear, undo } = useRoute.getState();
+  const { setPlanning, selectWp, remove, reorder, reverse, clear, undo, appendCopy } = useRoute.getState();
   const [expanded, setExpanded] = useState(true);
   const wps = route.waypoints;
   const { legs, totalNm } = useMemo(() => summarizeLegs(wps), [wps]);
@@ -82,7 +82,12 @@ export function RoutePanel({ onNavLog }: { onNavLog: () => void }) {
             </div>
           )}
           {legs.length > 0 && (
-            <button className="navlog-link" onClick={onNavLog}>{t.navlog} →</button>
+            <div className="route-links">
+              <button className="navlog-link" onClick={onNavLog}>{t.navlog} →</button>
+              {wps[wps.length - 1].name !== wps[0].name && (
+                <button className="navlog-link" onClick={() => appendCopy(wps[0].id)}>↩ {t.backTo} {wps[0].name}</button>
+              )}
+            </div>
           )}
           <ol className="wp-list" ref={listRef}>
             {wps.map((w, i) => {

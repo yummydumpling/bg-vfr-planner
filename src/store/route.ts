@@ -19,6 +19,8 @@ interface RouteState {
   selectWp: (id: string | null) => void;
   add: (wp: Waypoint, index?: number) => void;
   remove: (id: string) => void;
+  /** Append a copy of an existing waypoint (round trips). */
+  appendCopy: (id: string) => void;
   move: (id: string, to: { lat: number; lon: number }, snapped?: Omit<Waypoint, 'id'>) => void;
   reorder: (from: number, to: number) => void;
   rename: (id: string, name: string) => void;
@@ -61,6 +63,7 @@ export const useRoute = create<RouteState>()(
         setPlanning: (planning) => set({ planning }),
         selectWp: (selectedWp) => set({ selectedWp }),
         add: (wp, index) => edit((l) => ops.addWaypoint(l, wp, index)),
+        appendCopy: (id) => edit((l) => ops.appendCopyOf(l, id)),
         remove: (id) => edit((l) => ops.removeWaypoint(l, id)),
         move: (id, to, snapped) => edit((l) => ops.moveWaypoint(l, id, to, snapped)),
         reorder: (from, to) => edit((l) => ops.reorderWaypoint(l, from, to)),

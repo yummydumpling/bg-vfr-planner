@@ -20,10 +20,25 @@ export function userWaypoint(p: LatLon): Waypoint {
 
 const clampIndex = (i: number, len: number) => Math.max(0, Math.min(len, i));
 
-/** Append, or insert before `index` (0 = new departure). */
+const samePlace = (a?: Waypoint, b?: Waypoint) =>
+  !!a && !!b && Math.abs(a.lat - b.lat) < 1e-7 && Math.abs(a.lon - b.lon) < 1e-7;
+
+/**
+ * Append, or insert before `index` (0 = new departure).
+ * A point identical to its neighbour would make a zero-length leg → ignored.
+ */
 export function addWaypoint(list: Waypoint[], wp: Waypoint, index = list.length): Waypoint[] {
   const i = clampIndex(index, list.length);
+  if (samePlace(list[i - 1], wp) || samePlace(list[i], wp)) return list;
   return [...list.slice(0, i), wp, ...list.slice(i)];
+}
+
+/** Append a copy of an existing waypoint (e.g. return to the departure aerodrome). */
+export function appendCopyOf(list: Waypoint[], id: string): Waypoint[] {
+  const src = list.find((w) => w.id === id);
+  if (!src) return list;
+  const { id: _old, ...rest } = src;
+  return addWaypoint(list, makeWaypoint(rest));
 }
 
 export function removeWaypoint(list: Waypoint[], id: string): Waypoint[] {

@@ -11,6 +11,7 @@ import { useData } from '../store/data';
 import { useRoute } from '../store/route';
 import { useSettings, type LayerKey } from '../store/settings';
 import { BASE_STYLES, LAYER_IDS, addAeroLayers, setHighlightedAirspaces, updateLayerVisibility } from './layers';
+import { revealPoint } from './focus';
 import { setMapInstance } from './mapInstance';
 import { addRouteLayers, updateRouteLayers } from './routeLayer';
 import { RouteMarkers } from './routeMarkers';
@@ -44,6 +45,10 @@ function featureAt(map: maplibregl.Map, point: maplibregl.Point): { kind: PointK
     })
     .sort((a, b) => a.d2 - b.d2)[0].f;
   return { kind: KIND_BY_LAYER[nearest.layer.id], id: String(nearest.properties?.id) };
+}
+
+function highlightFor(sel: ReturnType<typeof useData.getState>['selection']) {
+  return sel?.kind === 'airspaces' ? { ids: sel.ids, focusId: sel.focusId, point: { lat: sel.lat, lon: sel.lon } } : null;
 }
 
 export function MapView() {
@@ -108,7 +113,19 @@ export function MapView() {
         useRoute.getState().add(wp, index);
         useRoute.getState().selectWp(wp.id);
       },
-      onTapWaypoint: (id) => useRoute.getState().selectWp(id),
+      onTapWaypoint: (id) => {
+        // While planning, tapping an earlier waypoint (e.g. the departure aerodrome
+        // under marker 1) routes back to it; tapping the last one just selects it.
+        const r = useRoute.getState();
+        const wps = r.route.waypoints;
+        if (r.planning && wps.length > 1 && wps[wps.length - 1].id !== id) {
+          r.appendCopy(id);
+          const after = useRoute.getState().route.waypoints;
+          r.selectWp(after[after.length - 1].id);
+        } else {
+          r.selectWp(id);
+        }
+      },
     });
     markersRef.current = markers;
 
@@ -118,8 +135,7 @@ export function MapView() {
       addAeroLayers(map, d, t, l);
       addRouteLayers(map, t);
       updateRouteLayers(map, useRoute.getState().route.waypoints);
-      const sel = useData.getState().selection;
-      setHighlightedAirspaces(map, sel?.kind === 'airspaces' ? sel.ids : []);
+      setHighlightedAirspaces(map, highlightFor(useData.getState().selection));
     };
     addOverlaysRef.current = addOverlays;
     map.on('style.load', () => {
@@ -153,7 +169,8 @@ export function MapView() {
       }
       const { lat, lng } = e.lngLat;
       const found = airspacesAt(d.airspaces, { lat, lon: lng }, (cat) => l[cat as LayerKey]);
-      useData.getState().select({ kind: 'airspaces', lat, lon: lng, ids: found.map((a) => a.id) });
+      useData.getState().select({ kind: 'airspaces', lat, lon: lng, ids: found.map((a) => a.id), focusId: found[0]?.id });
+      revealPoint(lat, lng);
     });
 
     for (const id of INTERACTIVE) {
@@ -187,10 +204,14 @@ export function MapView() {
     markersRef.current?.sync(waypoints, planning, selectedWp);
   }, [waypoints, planning, selectedWp]);
 
-  // Crosshair cursor while planning (desktop)
+  // While planning: crosshair cursor, and no double-tap zoom — two quick taps
+  // must add two waypoints, not zoom the map.
   useEffect(() => {
     const map = mapRef.current;
-    if (map) map.getCanvas().style.cursor = planning ? 'crosshair' : '';
+    if (!map) return;
+    map.getCanvas().style.cursor = planning ? 'crosshair' : '';
+    if (planning) map.doubleClickZoom.disable();
+    else map.doubleClickZoom.enable();
   }, [planning]);
 
   // Theme → swap base style (overlays are re-added on style.load)
@@ -210,7 +231,7 @@ export function MapView() {
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    setHighlightedAirspaces(map, selection?.kind === 'airspaces' ? selection.ids : []);
+    setHighlightedAirspaces(map, highlightFor(selection));
   }, [selection, theme]);
 
   return <div ref={container} className={`map${planning ? ' map-planning' : ''}`} role="application" aria-label="Map" />;

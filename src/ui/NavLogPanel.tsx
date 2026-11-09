@@ -9,6 +9,7 @@ import { formatTrack } from '../route/legs';
 import { useAircraft, useSelectedAircraft } from '../store/aircraft';
 import { useRoute } from '../store/route';
 import { AircraftEditor } from './AircraftEditor';
+import { CrossingList } from './CrossingList';
 import { IconClose, IconEdit, IconPlus } from './icons';
 import { NumField } from './NumField';
 
@@ -114,6 +115,10 @@ export function NavLogPanel({ onClose }: { onClose: () => void }) {
             </table>
           </div>
           <p className="muted small pad">{t.legend}</p>
+
+          <div className="pad">
+            <CrossingList route={route} onShowOnMap={onClose} />
+          </div>
 
           <div className="fuel-summary">
             <h3>{t.totals}</h3>

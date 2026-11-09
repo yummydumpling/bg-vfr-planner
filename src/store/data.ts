@@ -5,7 +5,7 @@ export type Selection =
   | { kind: 'airport'; id: string }
   | { kind: 'reporting'; id: string }
   | { kind: 'navaid'; id: string }
-  | { kind: 'airspaces'; lat: number; lon: number; ids: string[] };
+  | { kind: 'airspaces'; lat: number; lon: number; ids: string[]; focusId?: string };
 
 interface DataState {
   data: AeroData | null;
@@ -13,6 +13,8 @@ interface DataState {
   selection: Selection | null;
   load: (source?: AeroDataSource) => Promise<void>;
   select: (s: Selection | null) => void;
+  /** Focus one airspace in the current airspace selection. */
+  focusAirspace: (id: string) => void;
 }
 
 export const useData = create<DataState>()((set, get) => ({
@@ -28,4 +30,6 @@ export const useData = create<DataState>()((set, get) => ({
     }
   },
   select: (selection) => set({ selection }),
+  focusAirspace: (id) =>
+    set((s) => (s.selection?.kind === 'airspaces' ? { selection: { ...s.selection, focusId: id } } : {})),
 }));

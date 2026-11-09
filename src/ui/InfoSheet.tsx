@@ -3,6 +3,7 @@ import { airspaceBadge, formatLimit, formatVariation, pairRunways } from '../dom
 import type { Airport, AirspaceProps, Navaid, ReportingPoint } from '../domain/types';
 import { useT } from '../i18n';
 import type { Dict } from '../i18n/en';
+import { zoomToAirspace } from '../map/focus';
 import { formatDMS } from '../nav/coords';
 import { magneticVariation } from '../nav/magvar/wmm';
 import { waypointFromFeature, type PointKind } from '../route/fromData';
@@ -63,7 +64,7 @@ export function InfoSheet() {
     if (n) body = <><NavaidCard n={n} t={t} /><AddToRoute key={n.id} kind="navaid" id={n.id} t={t} /></>;
   } else {
     const list = selection.ids.map((id) => index.airspaces.get(id)).filter((x): x is AirspaceProps => !!x);
-    body = <AirspaceList list={list} lat={selection.lat} lon={selection.lon} t={t} />;
+    body = <AirspaceList list={list} lat={selection.lat} lon={selection.lon} focusId={selection.focusId} t={t} />;
   }
 
   return (
@@ -155,7 +156,9 @@ function AirportCard({ a, t }: { a: Airport; t: Dict }) {
   );
 }
 
-function AirspaceList({ list, lat, lon, t }: { list: AirspaceProps[]; lat: number; lon: number; t: Dict }) {
+function AirspaceList({ list, lat, lon, focusId, t }: { list: AirspaceProps[]; lat: number; lon: number; focusId?: string; t: Dict }) {
+  const focus = useData((s) => s.focusAirspace);
+  const data = useData((s) => s.data);
   return (
     <article>
       <header className="card-head">
@@ -163,9 +166,18 @@ function AirspaceList({ list, lat, lon, t }: { list: AirspaceProps[]; lat: numbe
         <div className="muted small mono">{formatDMS(lat, lon)}</div>
       </header>
       {list.length === 0 && <p>{t.noAirspace}</p>}
+      {list.length > 1 && <p className="muted small">{t.tapToShowAirspace}</p>}
       <ul className="as-list">
         {list.map((a) => (
-          <li key={a.id} className={`as-item ck-${a.type}`}>
+          <li
+            key={a.id}
+            className={`as-item ck-${a.type}${a.id === focusId ? ' focused' : ''}`}
+            role="button"
+            tabIndex={0}
+            aria-pressed={a.id === focusId}
+            onClick={() => { focus(a.id); if (data) zoomToAirspace(data.airspaces, a.id); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { focus(a.id); if (data) zoomToAirspace(data.airspaces, a.id); } }}
+          >
             <div className="as-limits mono">
               <span>{formatLimit(a.upper)}</span>
               <span className="as-rule" />
