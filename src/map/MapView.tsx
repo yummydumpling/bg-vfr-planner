@@ -50,6 +50,13 @@ export function MapView() {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<RouteMarkers | null>(null);
+  /**
+   * True once the current base style has fired `style.load`. We can't use
+   * map.isStyleLoaded(): it stays false while base-map tiles are still
+   * downloading, so data arriving in that window was never drawn.
+   */
+  const styleReady = useRef(false);
+  const addOverlaysRef = useRef<() => void>(() => undefined);
   const theme = useSettings((s) => s.theme);
   const layers = useSettings((s) => s.layers);
   const data = useData((s) => s.data);
@@ -114,7 +121,11 @@ export function MapView() {
       const sel = useData.getState().selection;
       setHighlightedAirspaces(map, sel?.kind === 'airspaces' ? sel.ids : []);
     };
-    map.on('style.load', addOverlays);
+    addOverlaysRef.current = addOverlays;
+    map.on('style.load', () => {
+      styleReady.current = true;
+      addOverlays();
+    });
     // Start with the attribution collapsed on small screens (still one tap away).
     map.once('load', () => {
       if (window.innerWidth < 760) container.current?.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
@@ -163,15 +174,9 @@ export function MapView() {
     };
   }, []);
 
-  // Data arrived after the style loaded
+  // Data arrived after the style loaded (overlay adding is idempotent)
   useEffect(() => {
-    const map = mapRef.current;
-    if (map && data && map.isStyleLoaded()) {
-      addAeroLayers(map, data, theme, layers);
-      addRouteLayers(map, theme);
-      updateRouteLayers(map, useRoute.getState().route.waypoints);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (data && styleReady.current) addOverlaysRef.current();
   }, [data]);
 
   // Route changed → redraw line and markers
@@ -194,6 +199,7 @@ export function MapView() {
     const map = mapRef.current;
     if (!map || theme === firstTheme.current) return;
     firstTheme.current = theme;
+    styleReady.current = false;
     map.setStyle(BASE_STYLES[theme], { diff: false });
   }, [theme]);
 
