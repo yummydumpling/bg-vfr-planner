@@ -8,6 +8,7 @@ import { DisclaimerBar, DisclaimerModal } from './ui/Disclaimer';
 import { InfoSheet } from './ui/InfoSheet';
 import { LayersPanel } from './ui/LayersPanel';
 import { NavLogPanel } from './ui/NavLogPanel';
+import { PrintView } from './ui/PrintView';
 import { RouteButton, RoutePanel } from './ui/RoutePanel';
 import { TopBar } from './ui/TopBar';
 import { UpdateBar } from './ui/UpdateBar';
@@ -21,6 +22,19 @@ export default function App() {
   const error = useData((s) => s.error);
   const [layersOpen, setLayersOpen] = useState(false);
   const [navLogOpen, setNavLogOpen] = useState(false);
+  const [printing, setPrinting] = useState(false);
+
+  // Render the print document, open the print dialog, then remove it again.
+  useEffect(() => {
+    if (!printing) return;
+    const done = () => setPrinting(false);
+    window.addEventListener('afterprint', done);
+    const id = window.setTimeout(() => window.print(), 50);
+    return () => {
+      window.clearTimeout(id);
+      window.removeEventListener('afterprint', done);
+    };
+  }, [printing]);
   const planning = useRoute((s) => s.planning);
 
   // Entering planning mode: taps add waypoints, so close any info card.
@@ -50,10 +64,11 @@ export default function App() {
         <RouteButton />
         <RoutePanel onNavLog={() => setNavLogOpen(true)} />
         <InfoSheet />
-        {navLogOpen && <NavLogPanel onClose={() => setNavLogOpen(false)} />}
+        {navLogOpen && <NavLogPanel onClose={() => setNavLogOpen(false)} onPrint={() => setPrinting(true)} />}
       </main>
       <DisclaimerBar />
       <DisclaimerModal />
+      {printing && <PrintView />}
     </div>
   );
 }

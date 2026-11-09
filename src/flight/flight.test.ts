@@ -18,7 +18,7 @@ describe('aircraft validation', () => {
 
 describe('buildNavLog', () => {
   const route: Route = {
-    id: 'r', name: '', updatedAt: '', cruiseAltFt: 3500,
+    id: 'r', name: '', updatedAt: '', cruiseAltFt: 3500, alternates: [],
     wind: { fromDeg: 360, speedKt: 20 },
     waypoints: [
       { id: 'a', lat: 42, lon: 25, name: 'A', kind: 'user' },

@@ -10,12 +10,13 @@ import { useAircraft, useSelectedAircraft } from '../store/aircraft';
 import { useRoute } from '../store/route';
 import { AircraftEditor } from './AircraftEditor';
 import { CrossingList } from './CrossingList';
+import { FlightPlanPanel } from './FlightPlanPanel';
 import { IconClose, IconEdit, IconPlus } from './icons';
 import { NumField } from './NumField';
 
 const trk = (v: number | null) => (v == null ? '—' : formatTrack(v));
 
-export function NavLogPanel({ onClose }: { onClose: () => void }) {
+export function NavLogPanel({ onClose, onPrint }: { onClose: () => void; onPrint: () => void }) {
   const t = useT();
   const route = useRoute((s) => s.route);
   const setWind = useRoute((s) => s.setWind);
@@ -23,6 +24,7 @@ export function NavLogPanel({ onClose }: { onClose: () => void }) {
   const aircraft = useSelectedAircraft();
   const { list, select, duplicate } = useAircraft();
   const [editing, setEditing] = useState<Aircraft | null>(null);
+  const [tab, setTab] = useState<'log' | 'fpl'>('log');
 
   const windValid = Number.isFinite(route.wind.fromDeg) && Number.isFinite(route.wind.speedKt) && route.wind.speedKt >= 0;
   const log = useMemo(
@@ -36,9 +38,18 @@ export function NavLogPanel({ onClose }: { onClose: () => void }) {
   return (
     <section className="fullsheet" aria-label={t.navlog}>
       <div className="panel-head sticky">
-        <h2>{t.navlog}</h2>
+        <div className="tabs" role="tablist">
+          <button role="tab" aria-selected={tab === 'log'} className={tab === 'log' ? 'active' : ''} onClick={() => setTab('log')}>{t.tabNavlog}</button>
+          <button role="tab" aria-selected={tab === 'fpl'} className={tab === 'fpl' ? 'active' : ''} onClick={() => setTab('fpl')}>{t.tabFpl}</button>
+        </div>
         <button className="btn-icon" onClick={onClose} aria-label={t.close}><IconClose /></button>
       </div>
+
+      {tab === 'fpl' ? (
+        <div className="pad">
+          <FlightPlanPanel aircraft={aircraft} log={log} onEditAircraft={() => setEditing(aircraft)} onPrint={onPrint} />
+        </div>
+      ) : (<>
 
       <div className="nl-settings">
         <div className="field">
@@ -141,6 +152,7 @@ export function NavLogPanel({ onClose }: { onClose: () => void }) {
           <p className="muted small pad">{t.disclaimerShort}</p>
         </>
       )}
+      </>)}
       {editing && <AircraftEditor initial={editing} onClose={() => setEditing(null)} />}
     </section>
   );

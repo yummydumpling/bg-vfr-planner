@@ -29,6 +29,7 @@ interface RouteState {
   undo: () => void;
   setWind: (w: RouteWind) => void;
   setCruiseAlt: (ft: number) => void;
+  setAlternates: (a: string[]) => void;
 }
 
 export const DEFAULT_CRUISE_ALT_FT = 3500;
@@ -39,6 +40,7 @@ const emptyRoute = (): Route => ({
   waypoints: [],
   cruiseAltFt: DEFAULT_CRUISE_ALT_FT,
   wind: { fromDeg: 0, speedKt: 0 },
+  alternates: [],
   updatedAt: new Date().toISOString(),
 });
 
@@ -71,6 +73,7 @@ export const useRoute = create<RouteState>()(
         reverse: () => edit((l) => (l.length > 1 ? ops.reverseRoute(l) : l)),
         clear: () => edit((l) => (l.length ? [] : l)),
         setWind: (wind) => set((s) => ({ route: { ...s.route, wind, updatedAt: new Date().toISOString() } })),
+        setAlternates: (alternates) => set((s) => ({ route: { ...s.route, alternates, updatedAt: new Date().toISOString() } })),
         setCruiseAlt: (cruiseAltFt) => set((s) => ({ route: { ...s.route, cruiseAltFt, updatedAt: new Date().toISOString() } })),
         undo: () => {
           const { route, past } = get();

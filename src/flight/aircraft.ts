@@ -14,8 +14,20 @@ export function defaultAircraft(): Aircraft {
     taxiFuel: 5,
     reserveMinutes: 30,
     fuelUnit: 'L',
+    ...AIRCRAFT_FPL_DEFAULTS,
   };
 }
+
+/** Flight-plan fields added after the first release; also used to upgrade stored profiles. */
+export const AIRCRAFT_FPL_DEFAULTS = {
+  wake: 'L' as const,
+  equipment: 'SY',
+  surveillance: 'C',
+  colour: '',
+  emergencyRadio: '',
+  survival: '',
+  jackets: '',
+};
 
 export type AircraftErrors = Partial<Record<keyof Aircraft, string>>;
 
@@ -30,5 +42,7 @@ export function validateAircraft(a: Aircraft): AircraftErrors {
   if (!num(a.taxiFuel) || a.taxiFuel < 0 || a.taxiFuel >= a.usableFuel) e.taxiFuel = 'errTaxi';
   if (!num(a.reserveMinutes) || a.reserveMinutes < 0 || a.reserveMinutes > 180) e.reserveMinutes = 'errReserve';
   if (a.icaoType && !/^[A-Z0-9]{2,4}$/.test(a.icaoType)) e.icaoType = 'errIcaoType';
+  if (!/^[A-Z0-9]{1,20}$/i.test(a.equipment || '')) e.equipment = 'errEquipment';
+  if (!/^[A-Z0-9]{1,20}$/i.test(a.surveillance || '')) e.surveillance = 'errEquipment';
   return e;
 }

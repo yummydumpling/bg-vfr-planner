@@ -73,6 +73,43 @@ export function AircraftEditor({ initial, onClose }: { initial: Aircraft; onClos
             <NumField label={t.taxiFuel} value={a.taxiFuel} onChange={(v) => set('taxiFuel', v)} suffix={u} decimal error={err('taxiFuel')} />
             <NumField label={t.reserve} value={a.reserveMinutes} onChange={(v) => set('reserveMinutes', v)} suffix={t.minutes} error={err('reserveMinutes')} />
           </div>
+          <h3 className="form-sub">{t.fplDetails}</h3>
+          <div className="field-row">
+            <div className="field">
+              <span className="field-label">{t.wakeLbl}</span>
+              <div className="segmented" role="radiogroup">
+                {(['L', 'M'] as const).map((w) => (
+                  <button type="button" key={w} role="radio" aria-checked={a.wake === w} className={a.wake === w ? 'active' : ''} onClick={() => set('wake', w)}>{w}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="field-row">
+            {(['equipment', 'surveillance'] as const).map((k) => (
+              <label key={k} className={`field${errors[k] ? ' has-error' : ''}`}>
+                <span className="field-label">{k === 'equipment' ? t.equipmentLbl : t.surveillanceLbl}</span>
+                <span className="field-input">
+                  <input value={a[k]} onChange={(e) => set(k, e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))} autoCapitalize="characters" autoComplete="off" placeholder={k === 'equipment' ? 'SY' : 'C'} />
+                </span>
+                {err(k) && <span className="field-error">{err(k)}</span>}
+              </label>
+            ))}
+          </div>
+          <label className="field">
+            <span className="field-label">{t.colourLbl}</span>
+            <span className="field-input"><input value={a.colour} onChange={(e) => set('colour', e.target.value.toUpperCase())} autoCapitalize="characters" autoComplete="off" placeholder="WHITE BLUE" /></span>
+          </label>
+          <div className="field-row three">
+            {([['emergencyRadio', t.emergencyRadioLbl, 'UVE'], ['survival', t.survivalLbl, 'PDMJ'], ['jackets', t.jacketsLbl, 'LFUV']] as const).map(([k, label, allowed]) => (
+              <label key={k} className="field compact">
+                <span className="field-label">{label}</span>
+                <span className="field-input">
+                  <input value={a[k]} maxLength={4} autoCapitalize="characters" autoComplete="off"
+                    onChange={(e) => set(k, [...new Set(e.target.value.toUpperCase().split('').filter((c) => allowed.includes(c)))].join(''))} />
+                </span>
+              </label>
+            ))}
+          </div>
           <div className="form-actions">
             {!isNew && list.length > 1 && (
               <button type="button" className="btn-text danger" onClick={() => { remove(a.id); onClose(); }}>{t.delete}</button>

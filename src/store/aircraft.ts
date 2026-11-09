@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Aircraft } from '../domain/types';
-import { defaultAircraft } from '../flight/aircraft';
+import { AIRCRAFT_FPL_DEFAULTS, defaultAircraft } from '../flight/aircraft';
 import { newId } from '../route/id';
 import { safeStorage } from './safeStorage';
 
@@ -41,7 +41,16 @@ export const useAircraft = create<AircraftState>()(
         return { ...src, id: newId(), name: `${src.name} (2)` };
       },
     }),
-    { name: 'bgvfr-aircraft', storage: createJSONStorage(() => safeStorage) },
+    {
+      name: 'bgvfr-aircraft',
+      storage: createJSONStorage(() => safeStorage),
+      // Profiles saved by older versions lack the flight-plan fields.
+      merge: (persisted, current) => {
+        const p = persisted as Partial<AircraftState> | undefined;
+        if (!p?.list?.length) return current;
+        return { ...current, ...p, list: p.list.map((a) => ({ ...AIRCRAFT_FPL_DEFAULTS, ...a })) };
+      },
+    },
   ),
 );
 

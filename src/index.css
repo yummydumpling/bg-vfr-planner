@@ -430,3 +430,62 @@ table.navlog tfoot .sticky-col { background: var(--surface-2); }
   .cx-limits { grid-column: 2; flex-direction: row; gap: 6px; justify-content: flex-start; min-width: 0; }
   .cx-limits .as-rule { width: 10px; border-top-width: 1.5px; }
 }
+
+/* ---------- Flight plan ---------- */
+.tabs { display: flex; gap: 4px; padding: 6px 0; }
+.tabs button {
+  min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: transparent;
+  font-weight: 700; font-size: 16px; color: var(--muted); cursor: pointer;
+}
+.tabs button.active { background: var(--surface-2); color: var(--text); }
+.fpl { max-width: 760px; }
+.fpl section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin: 18px 0 4px; display: flex; align-items: center; gap: 6px; }
+.form-sub { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin: 18px 0 0; }
+.inline-edit { color: var(--primary); }
+.problems { margin: 10px 0; padding: 10px 12px 10px 28px; border-radius: 10px; background: var(--warn-bg); color: var(--warn-text); font-size: 14px; }
+.fpl-fields { margin: 0; }
+.fpl-fields > div { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.fpl-fields dt { font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
+.item-no {
+  display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 4px; border-radius: 6px;
+  background: var(--accent); color: #fff; font-weight: 700; font-size: 11.5px; margin-right: 4px;
+}
+:root[data-theme='dark'] .item-no { background: #1c5fad; }
+.fpl-fields dd { margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.fpl-fields code { font: 600 15px var(--mono); word-break: break-word; }
+.btn-copy {
+  flex: none; min-height: 36px; min-width: 76px; padding: 0 12px; border: 1.5px solid var(--border); border-radius: 9px;
+  background: var(--surface-2); font-weight: 600; font-size: 13.5px; cursor: pointer;
+}
+.fpl-message {
+  margin: 6px 0; padding: 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
+  font: 14px/1.5 var(--mono); white-space: pre-wrap; word-break: break-word;
+}
+.fpl-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.fpl-actions .btn-secondary { text-decoration: none; }
+
+/* ---------- Print ---------- */
+.print-root { display: none; }
+@media print {
+  @page { size: A4; margin: 12mm; }
+  html, body { height: auto !important; background: #fff !important; }
+  #root { display: none !important; }
+  .print-root { display: block; color: #000; font: 10.5pt/1.35 system-ui, sans-serif; }
+  .print-root h1 { font-size: 15pt; margin: 0 0 2mm; }
+  .print-root h2 { font-size: 11.5pt; margin: 5mm 0 1.5mm; border-bottom: 1px solid #000; }
+  .pr-head div { font-size: 9.5pt; }
+  .print-root table { width: 100%; border-collapse: collapse; }
+  .print-root th, .print-root td { border: 1px solid #999; padding: 1.2mm 1.6mm; text-align: left; vertical-align: top; }
+  .print-root th { background: #eee; font-weight: 600; }
+  .pr-fpl th { width: 10mm; text-align: center; }
+  .pr-fpl td { font-family: ui-monospace, Menlo, monospace; }
+  .pr-msg { font: 9.5pt ui-monospace, Menlo, monospace; border: 1px solid #999; padding: 2mm; white-space: pre-wrap; }
+  .pr-log td, .pr-log th { text-align: right; font-family: ui-monospace, Menlo, monospace; font-size: 9.5pt; }
+  .pr-log td:first-child, .pr-log th:first-child { text-align: left; font-family: system-ui, sans-serif; }
+  .pr-log td.blank { min-width: 14mm; }
+  .pr-fuel { margin-top: 2mm; }
+  .print-root .b { font-weight: 700; }
+  .pr-cx { font-size: 9.5pt; }
+  .pr-foot { margin-top: 5mm; font-size: 8pt; color: #333; }
+  tr { break-inside: avoid; }
+}

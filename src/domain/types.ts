@@ -156,6 +156,8 @@ export interface Route {
   /** Planned cruise altitude, ft AMSL. */
   cruiseAltFt: number;
   wind: RouteWind;
+  /** Alternate aerodromes (ICAO), max 2 used in the flight plan. */
+  alternates: string[];
   updatedAt: string;
 }
 
@@ -177,4 +179,19 @@ export interface Aircraft {
   /** Final reserve in minutes at cruise burn. */
   reserveMinutes: number;
   fuelUnit: FuelUnit;
+  // Flight plan details (items 9, 10, 19)
+  /** Wake turbulence category. */
+  wake: 'L' | 'M' | 'H' | 'J';
+  /** Item 10a COM/NAV equipment, e.g. "SY". */
+  equipment: string;
+  /** Item 10b surveillance equipment, e.g. "C" (mode C) or "S" (mode S). */
+  surveillance: string;
+  /** Item 19 A/: colour and markings. */
+  colour: string;
+  /** Item 19 R/: emergency radio — U (UHF 243), V (VHF 121.5), E (ELT). */
+  emergencyRadio: string;
+  /** Item 19 S/: survival equipment — P, D, M, J. */
+  survival: string;
+  /** Item 19 J/: life jackets — L, F, U, V. */
+  jackets: string;
 }

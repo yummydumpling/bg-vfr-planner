@@ -15,7 +15,7 @@ Bulgarian / English UI, mobile-first, dark mode, works offline after first load.
 | 3 | Route planning: tap to add (snaps to aerodromes/points/navaids), drag to move, + to insert, reorder, delete, reverse, undo | ✅ done |
 | 4 | Nav log (TT, VAR, MT, WCA, MH, GS, ETE, fuel per leg + totals with reserve), aircraft profiles, wind & cruise altitude | ✅ done |
 | 5 | Airspace crossing list (entry/exit NM, limits vs cruise altitude, tap to show on map) | ✅ done |
-| 6 | ICAO Item 15 generator | — |
+| 6 | ICAO flight plan (items 7–19, per-field copy for B-FLIP, full FPL message), share, print/PDF, pilot details | ✅ done |
 | 7 | METAR / TAF | — |
 | 8 | Save/load, GPX import/export | — |
 
