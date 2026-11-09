@@ -1,0 +1,6 @@
+Aeronautical data in this folder (airspaces, aerodromes, reporting points, navaids)
+© openAIP contributors — https://www.openaip.net
+Licensed under Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+https://creativecommons.org/licenses/by-nc/4.0/
+Normalised by BG VFR Planner (scripts/fetch-openaip.ts). Snapshot date: see meta.json.
+NOT FOR PRIMARY NAVIGATION — verify against the official AIP Bulgaria and NOTAMs.

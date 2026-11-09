@@ -1,0 +1,75 @@
+import type { Dict } from './en';
+
+export const bg: Dict = {
+  appName: 'BG VFR Planner',
+  disclaimerShort: 'Само спомагателен инструмент — не е за основна навигация. Винаги проверявайте в официалния AIP, NOTAM и брифинга.',
+  disclaimerTitle: 'Преди да използвате приложението',
+  disclaimerBody:
+    'BG VFR Planner е спомагателно средство за планиране. То НЕ е одобрено за основна навигация и данните в него може да са непълни, остарели или грешни. ' +
+    'Винаги проверявайте маршрута, въздушното пространство, честотите и информацията за летищата в официалния AIP на България, актуалните NOTAM, AUP/UUP и официалния предполетен брифинг. ' +
+    'Командирът на въздухоплавателното средство носи изцяло отговорността за безопасното изпълнение на полета.',
+  disclaimerAccept: 'Разбрах',
+  language: 'Език',
+  theme: 'Тема',
+  themeDark: 'Тъмна',
+  themeLight: 'Светла',
+  layers: 'Слоеве',
+  close: 'Затвори',
+  loading: 'Зареждане на аеронавигационни данни…',
+  loadError: 'Аеронавигационните данни не могат да бъдат заредени.',
+  dataSource: 'Аеронавигационни данни',
+  dataFetched: 'към',
+  about: 'Данни и лицензи',
+
+  lyrControlled: 'Контролирано пространство (CTR / TMA / CTA)',
+  lyrAtz: 'Летищни зони (ATZ / MATZ / HTZ)',
+  lyrRestricted: 'Забранени / ограничени / опасни / TRA / TSA',
+  lyrZones: 'TMZ / RMZ / планеризъм / спорт',
+  lyrFir: 'Граници на FIR',
+  lyrOther: 'Друго пространство (въздушни трасета, сектори…)',
+  lyrAirports: 'Летища и площадки за кацане',
+  lyrReporting: 'VFR точки за докладване',
+  lyrNavaids: 'Радионавигационни средства',
+
+  elevation: 'Превишение',
+  position: 'Координати',
+  magVar: 'Магнитна деклинация',
+  runways: 'Писти',
+  frequencies: 'Честоти',
+  noFrequencies: 'Няма честоти в данните',
+  noRunways: 'Няма данни за писти',
+  officialInfo: 'Официална информация',
+  bflipLink: 'Страница на летището в BULATSA B-FLIP',
+  bflipNote: 'Може да изисква безплатна регистрация в B-FLIP.',
+  aipLink: 'AIP на България (BULATSA)',
+  verifyNote: 'Данни от openAIP — проверете в официалния AIP.',
+  ppr: 'PPR',
+  private: 'Частно',
+  ifr: 'IFR',
+
+  airspacesHere: 'Въздушно пространство в тази точка',
+  noAirspace: 'Няма въздушно пространство в данните в тази точка (клас G).',
+  byNotam: 'Активира се с NOTAM',
+  onRequest: 'При поискване',
+  onDemand: 'При необходимост',
+  activityNote: 'Проверете активирането (AUP/UUP, NOTAM) преди полет.',
+
+  reportingPoint: 'VFR точка за докладване',
+  compulsory: 'Задължителна',
+  onRequestPoint: 'При поискване',
+  forAerodromes: 'Летища',
+  navaid: 'Радионавигационно средство',
+  channel: 'Канал',
+  frequency: 'Честота',
+
+  surface: {
+    ASPHALT: 'Асфалт', CONCRETE: 'Бетон', GRASS: 'Трева', SAND: 'Пясък', WATER: 'Вода',
+    GRAVEL: 'Чакъл', EARTH: 'Пръст', OTHER: 'Друго', UNKNOWN: 'Неизвестна настилка',
+  },
+  airportKind: {
+    INTL: 'Международно летище', AIRPORT: 'Летище', AIRFIELD: 'Летателна площадка', IFR_AIRFIELD: 'IFR летище',
+    GLIDER: 'Планерно летище', ULTRALIGHT: 'Площадка за свръхлеки', HELI_CIVIL: 'Хелиодрум', HELI_MIL: 'Военен хелиодрум',
+    MILITARY: 'Военно летище', CLOSED: 'Затворено летище', WATER: 'Хидролетище', STRIP: 'Площадка за кацане',
+    AGRI_STRIP: 'Селскостопанска площадка', ALTIPORT: 'Висопланинско летище',
+  },
+};

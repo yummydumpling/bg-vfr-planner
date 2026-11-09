@@ -11,7 +11,7 @@ Bulgarian / English UI, mobile-first, dark mode, works offline after first load.
 | Step | Feature | State |
 |---|---|---|
 | 1 | Navigation maths module (`src/nav`) + unit tests | ✅ done |
-| 2 | Map, airspace, airports, reporting points | ⏳ needs openAIP key |
+| 2 | Map, airspace, airports, reporting points, info cards, BG/EN, dark mode, offline PWA | ✅ done |
 | 3 | Route editing | — |
 | 4 | Nav log + aircraft profiles | — |
 | 5 | Airspace crossing list | — |
@@ -29,6 +29,21 @@ npm test          # unit tests (Vitest)
 npm run dev       # dev server
 npm run build     # production build
 ```
+
+### Refreshing the aeronautical data
+
+The openAIP snapshot in `public/data/bg/` is committed, so building does **not** need a key.
+To refresh it (e.g. each AIRAC cycle), get a free API key at openaip.net → profile → *API Clients*,
+then put it in a git-ignored `.env.local` file:
+
+```bash
+echo "OPENAIP_API_KEY=your-key" > .env.local
+npm run data:fetch
+```
+
+If you are behind an HTTP proxy, run it with `NODE_USE_ENV_PROXY=1` (Node ≥ 22.21).
+The script downloads Bulgaria plus neighbouring airspace/aerodromes near the border
+(RO, RS, MK, GR, TR) and writes normalised JSON.
 
 ## Navigation maths (`src/nav`)
 
