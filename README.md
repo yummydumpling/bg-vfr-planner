@@ -16,7 +16,7 @@ Bulgarian / English UI, mobile-first, dark mode, works offline after first load.
 | 4 | Nav log (TT, VAR, MT, WCA, MH, GS, ETE, fuel per leg + totals with reserve), aircraft profiles, wind & cruise altitude | ✅ done |
 | 5 | Airspace crossing list (entry/exit NM, limits vs cruise altitude, tap to show on map) | ✅ done |
 | 6 | ICAO flight plan (items 7–19, per-field copy for B-FLIP, full FPL message), share, print/PDF, pilot details | ✅ done |
-| 7 | METAR / TAF | — |
+| 7 | METAR / TAF (Weather tab + aerodrome cards, report age, offline cache) via Cloudflare Worker proxy | ✅ code done — proxy to be deployed |
 | 8 | Save/load, GPX import/export | — |
 
 ## Setup
@@ -29,6 +29,17 @@ npm test          # unit tests (Vitest)
 npm run dev       # dev server
 npm run build     # production build
 ```
+
+### Weather (METAR/TAF)
+
+The browser can't call aviationweather.gov directly (no CORS), so the app uses a
+small Cloudflare Worker — see [`proxy/README.md`](proxy/README.md). Build with its URL:
+
+```bash
+VITE_WX_PROXY_URL=https://bg-vfr-weather.<subdomain>.workers.dev npm run build
+```
+
+In development (`npm run dev`) the Vite dev server proxies `/wx` to aviationweather.gov instead.
 
 ### Refreshing the aeronautical data
 

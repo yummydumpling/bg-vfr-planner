@@ -18,7 +18,18 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(`${pkg.version}+${commit}`),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   },
-  server: { host: true },
+  server: {
+    host: true,
+    // Dev only: same API shape as the Cloudflare Worker in proxy/worker.js
+    proxy: {
+      '/wx': {
+        target: 'https://aviationweather.gov',
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/wx/, '/api/data'),
+        headers: { 'User-Agent': 'BG-VFR-Planner-dev' },
+      },
+    },
+  },
   worker: { format: 'es' },
   preview: { host: true },
   plugins: [
@@ -81,6 +92,6 @@ export default defineConfig({
   ],
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'scripts/**/*.test.ts', 'proxy/**/*.test.ts'],
   },
 });

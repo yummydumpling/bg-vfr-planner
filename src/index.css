@@ -489,3 +489,21 @@ table.navlog tfoot .sticky-col { background: var(--surface-2); }
   .pr-foot { margin-top: 5mm; font-size: 8pt; color: #333; }
   tr { break-inside: avoid; }
 }
+
+/* ---------- Weather ---------- */
+.wx-panel { max-width: 760px; padding-top: 6px; }
+.wx-status { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 6px 0; }
+.alert-soft { width: 100%; margin: 6px 0; padding: 8px 10px; border-radius: 10px; background: var(--warn-bg); color: var(--warn-text); font-size: 13.5px; }
+.wx-station { padding: 10px 12px; margin: 10px 0; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.wx-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 17px; }
+.wx-block { margin-top: 8px; }
+.wx-label { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-weight: 800; font-size: 12.5px; letter-spacing: 0.5px; color: var(--muted); }
+.wx-age { font-weight: 500; letter-spacing: 0; font-size: 12.5px; }
+.wx-age.age-aging { color: #e67700; }
+.wx-age.age-old { color: #e03131; }
+.wx-raw { margin: 4px 0 0; font: 600 14px/1.45 var(--mono); white-space: pre-wrap; word-break: break-word; color: var(--text); }
+.badge.cat { color: #fff; border-color: transparent; font-weight: 800; }
+.cat-VFR { background: #2b8a3e; }
+.cat-MVFR { background: #1c7ed6; }
+.cat-IFR { background: #e03131; }
+.cat-LIFR { background: #ae3ec9; }

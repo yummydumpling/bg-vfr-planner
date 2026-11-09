@@ -11,6 +11,7 @@ import { useRoute } from '../store/route';
 import { AircraftEditor } from './AircraftEditor';
 import { CrossingList } from './CrossingList';
 import { FlightPlanPanel } from './FlightPlanPanel';
+import { WeatherPanel } from './WeatherPanel';
 import { IconClose, IconEdit, IconPlus } from './icons';
 import { NumField } from './NumField';
 
@@ -24,7 +25,7 @@ export function NavLogPanel({ onClose, onPrint }: { onClose: () => void; onPrint
   const aircraft = useSelectedAircraft();
   const { list, select, duplicate } = useAircraft();
   const [editing, setEditing] = useState<Aircraft | null>(null);
-  const [tab, setTab] = useState<'log' | 'fpl'>('log');
+  const [tab, setTab] = useState<'log' | 'fpl' | 'wx'>('log');
 
   const windValid = Number.isFinite(route.wind.fromDeg) && Number.isFinite(route.wind.speedKt) && route.wind.speedKt >= 0;
   const log = useMemo(
@@ -41,11 +42,14 @@ export function NavLogPanel({ onClose, onPrint }: { onClose: () => void; onPrint
         <div className="tabs" role="tablist">
           <button role="tab" aria-selected={tab === 'log'} className={tab === 'log' ? 'active' : ''} onClick={() => setTab('log')}>{t.tabNavlog}</button>
           <button role="tab" aria-selected={tab === 'fpl'} className={tab === 'fpl' ? 'active' : ''} onClick={() => setTab('fpl')}>{t.tabFpl}</button>
+          <button role="tab" aria-selected={tab === 'wx'} className={tab === 'wx' ? 'active' : ''} onClick={() => setTab('wx')}>{t.tabWx}</button>
         </div>
         <button className="btn-icon" onClick={onClose} aria-label={t.close}><IconClose /></button>
       </div>
 
-      {tab === 'fpl' ? (
+      {tab === 'wx' ? (
+        <div className="pad"><WeatherPanel /></div>
+      ) : tab === 'fpl' ? (
         <div className="pad">
           <FlightPlanPanel aircraft={aircraft} log={log} onEditAircraft={() => setEditing(aircraft)} onPrint={onPrint} />
         </div>

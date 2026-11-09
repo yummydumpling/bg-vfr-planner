@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { airspaceBadge, formatLimit, formatVariation, pairRunways } from '../domain/format';
 import type { Airport, AirspaceProps, Navaid, ReportingPoint } from '../domain/types';
 import { useT } from '../i18n';
@@ -10,6 +10,8 @@ import { waypointFromFeature, type PointKind } from '../route/fromData';
 import { makeWaypoint } from '../route/ops';
 import { useData } from '../store/data';
 import { useRoute } from '../store/route';
+import { useWeather } from '../store/weather';
+import { StationWeather, WeatherStatus } from './StationWeather';
 import { IconClose, IconExternal, IconPlus } from './icons';
 
 /** Append this aerodrome / point / navaid to the working route. */
@@ -137,6 +139,8 @@ function AirportCard({ a, t }: { a: Airport; t: Dict }) {
         </table>
       ) : <p className="muted">{t.noFrequencies}</p>}
 
+      {a.icao && <AirportWeather icao={a.icao} t={t} />}
+
       <h3>{t.officialInfo}</h3>
       <ul className="links">
         {isBg && (
@@ -153,6 +157,22 @@ function AirportCard({ a, t }: { a: Airport; t: Dict }) {
       </ul>
       <p className="muted small">{t.verifyNote}</p>
     </article>
+  );
+}
+
+function AirportWeather({ icao, t }: { icao: string; t: Dict }) {
+  const refresh = useWeather((s) => s.refresh);
+  const configured = useWeather((s) => s.configured);
+  useEffect(() => {
+    void refresh([icao]);
+  }, [icao, refresh]);
+  if (!configured) return null;
+  return (
+    <>
+      <h3>{t.weather}</h3>
+      <WeatherStatus ids={[icao]} />
+      <StationWeather icao={icao} />
+    </>
   );
 }
 
