@@ -136,6 +136,9 @@ export const en = {
   errReserve: 'Enter 0–180 min',
   errIcaoType: '2–4 letters/digits, e.g. C172',
 
+  updateReady: 'A new version is ready.',
+  updateNow: 'Update',
+  version: 'Version',
   surface: {
     ASPHALT: 'Asphalt', CONCRETE: 'Concrete', GRASS: 'Grass', SAND: 'Sand', WATER: 'Water',
     GRAVEL: 'Gravel', EARTH: 'Earth', OTHER: 'Other', UNKNOWN: 'Unknown surface',

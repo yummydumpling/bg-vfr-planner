@@ -10,6 +10,7 @@ import { LayersPanel } from './ui/LayersPanel';
 import { NavLogPanel } from './ui/NavLogPanel';
 import { RouteButton, RoutePanel } from './ui/RoutePanel';
 import { TopBar } from './ui/TopBar';
+import { UpdateBar } from './ui/UpdateBar';
 
 export default function App() {
   const t = useT();
@@ -42,6 +43,7 @@ export default function App() {
       <TopBar onLayers={() => setLayersOpen((o) => !o)} onNavLog={() => setNavLogOpen((o) => !o)} />
       <main className="main">
         <MapView />
+        <UpdateBar />
         {!loaded && !error && <div className="toast">{t.loading}</div>}
         {error && <div className="toast error">{t.loadError} ({error})</div>}
         {layersOpen && <LayersPanel onClose={() => setLayersOpen(false)} />}

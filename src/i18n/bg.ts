@@ -132,6 +132,9 @@ export const bg: Dict = {
   errReserve: 'Въведете 0–180 мин',
   errIcaoType: '2–4 букви/цифри, напр. C172',
 
+  updateReady: 'Има нова версия.',
+  updateNow: 'Обнови',
+  version: 'Версия',
   surface: {
     ASPHALT: 'Асфалт', CONCRETE: 'Бетон', GRASS: 'Трева', SAND: 'Пясък', WATER: 'Вода',
     GRAVEL: 'Чакъл', EARTH: 'Пръст', OTHER: 'Друго', UNKNOWN: 'Неизвестна настилка',

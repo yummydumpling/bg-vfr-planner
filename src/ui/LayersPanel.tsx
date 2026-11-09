@@ -55,6 +55,9 @@ export function LayersPanel({ onClose }: { onClose: () => void }) {
             <a href="https://www.ncei.noaa.gov/products/world-magnetic-model" target="_blank" rel="noopener">WMM2025</a>
           </li>
           <li>
+            {t.version}: <span className="mono">{__APP_VERSION__}</span> ({__BUILD_TIME__.slice(0, 16).replace('T', ' ')} UTC)
+          </li>
+          <li>
             AIP Bulgaria: <a href="https://b-flip.bulatsa.com" target="_blank" rel="noopener">BULATSA B-FLIP</a>
           </li>
         </ul>

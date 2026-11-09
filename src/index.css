@@ -368,3 +368,14 @@ table.navlog tfoot .sticky-col { background: var(--surface-2); }
   font-weight: 700; font-size: 14px; min-height: 36px; cursor: pointer; padding: 0;
 }
 @media (max-width: 360px) { .brand-name { display: none; } }
+
+.update-bar {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 9;
+  display: flex; align-items: center; gap: 12px; padding: 6px 6px 6px 14px; border-radius: 12px;
+  background: var(--accent); color: #fff; box-shadow: var(--shadow); font-size: 14px; white-space: nowrap;
+}
+:root[data-theme='dark'] .update-bar { background: #1c5fad; }
+.update-bar button {
+  min-height: 36px; padding: 0 14px; border: 0; border-radius: 8px; background: #fff; color: #0b2545;
+  font-weight: 700; cursor: pointer;
+}

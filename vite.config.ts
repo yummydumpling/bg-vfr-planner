@@ -1,12 +1,23 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 import { VitePWA } from 'vite-plugin-pwa';
+import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string };
+const commit = (() => {
+  try { return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return 'dev'; }
+})();
 
 // BASE_PATH lets the same build run at a sub-path (e.g. GitHub Pages: /bg-vfr-planner/).
 const base = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   base,
+  define: {
+    __APP_VERSION__: JSON.stringify(`${pkg.version}+${commit}`),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
   server: { host: true },
   worker: { format: 'es' },
   preview: { host: true },
@@ -14,6 +25,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Registered from src/pwa/updates.ts, which controls when the page reloads.
+      injectRegister: false,
       includeAssets: ['icons/*.png', 'icons/*.svg'],
       manifest: {
         name: 'BG VFR Planner',
@@ -33,6 +46,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         // App shell + bundled aeronautical data are precached → works offline.
         globPatterns: ['**/*.{js,css,html,png,svg,json,geojson,webmanifest}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
