@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { Route, Waypoint } from '../domain/types';
+import type { Route, RouteWind, Waypoint } from '../domain/types';
 import { newId } from '../route/id';
 import * as ops from '../route/ops';
 import { safeStorage } from './safeStorage';
@@ -25,9 +25,20 @@ interface RouteState {
   reverse: () => void;
   clear: () => void;
   undo: () => void;
+  setWind: (w: RouteWind) => void;
+  setCruiseAlt: (ft: number) => void;
 }
 
-const emptyRoute = (): Route => ({ id: newId(), name: '', waypoints: [], updatedAt: new Date().toISOString() });
+export const DEFAULT_CRUISE_ALT_FT = 3500;
+
+const emptyRoute = (): Route => ({
+  id: newId(),
+  name: '',
+  waypoints: [],
+  cruiseAltFt: DEFAULT_CRUISE_ALT_FT,
+  wind: { fromDeg: 0, speedKt: 0 },
+  updatedAt: new Date().toISOString(),
+});
 
 export const useRoute = create<RouteState>()(
   persist(
@@ -56,6 +67,8 @@ export const useRoute = create<RouteState>()(
         rename: (id, name) => edit((l) => ops.renameWaypoint(l, id, name)),
         reverse: () => edit((l) => (l.length > 1 ? ops.reverseRoute(l) : l)),
         clear: () => edit((l) => (l.length ? [] : l)),
+        setWind: (wind) => set((s) => ({ route: { ...s.route, wind, updatedAt: new Date().toISOString() } })),
+        setCruiseAlt: (cruiseAltFt) => set((s) => ({ route: { ...s.route, cruiseAltFt, updatedAt: new Date().toISOString() } })),
         undo: () => {
           const { route, past } = get();
           if (!past.length) return;
@@ -71,6 +84,12 @@ export const useRoute = create<RouteState>()(
       name: 'bgvfr-route',
       storage: createJSONStorage(() => safeStorage),
       partialize: (s) => ({ route: s.route }),
+      // Routes stored by older versions lack wind/altitude → fill defaults.
+      merge: (persisted, current) => {
+        const r = (persisted as { route?: Partial<Route> } | undefined)?.route;
+        if (!r) return current;
+        return { ...current, route: { ...emptyRoute(), ...r } };
+      },
     },
   ),
 );

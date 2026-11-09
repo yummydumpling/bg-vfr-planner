@@ -37,7 +37,7 @@ export function RouteButton() {
   );
 }
 
-export function RoutePanel() {
+export function RoutePanel({ onNavLog }: { onNavLog: () => void }) {
   const t = useT();
   const { route, planning, selectedWp, past } = useRoute();
   const { setPlanning, selectWp, remove, reorder, reverse, clear, undo } = useRoute.getState();
@@ -80,6 +80,9 @@ export function RoutePanel() {
               <strong>{t.routeHintTitle}</strong>
               <p>{t.routeHint}</p>
             </div>
+          )}
+          {legs.length > 0 && (
+            <button className="navlog-link" onClick={onNavLog}>{t.navlog} →</button>
           )}
           <ol className="wp-list" ref={listRef}>
             {wps.map((w, i) => {

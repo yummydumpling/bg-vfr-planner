@@ -7,6 +7,7 @@ import { useSettings } from './store/settings';
 import { DisclaimerBar, DisclaimerModal } from './ui/Disclaimer';
 import { InfoSheet } from './ui/InfoSheet';
 import { LayersPanel } from './ui/LayersPanel';
+import { NavLogPanel } from './ui/NavLogPanel';
 import { RouteButton, RoutePanel } from './ui/RoutePanel';
 import { TopBar } from './ui/TopBar';
 
@@ -18,6 +19,7 @@ export default function App() {
   const loaded = useData((s) => !!s.data);
   const error = useData((s) => s.error);
   const [layersOpen, setLayersOpen] = useState(false);
+  const [navLogOpen, setNavLogOpen] = useState(false);
   const planning = useRoute((s) => s.planning);
 
   // Entering planning mode: taps add waypoints, so close any info card.
@@ -37,15 +39,16 @@ export default function App() {
 
   return (
     <div className="app">
-      <TopBar onLayers={() => setLayersOpen((o) => !o)} />
+      <TopBar onLayers={() => setLayersOpen((o) => !o)} onNavLog={() => setNavLogOpen((o) => !o)} />
       <main className="main">
         <MapView />
         {!loaded && !error && <div className="toast">{t.loading}</div>}
         {error && <div className="toast error">{t.loadError} ({error})</div>}
         {layersOpen && <LayersPanel onClose={() => setLayersOpen(false)} />}
         <RouteButton />
-        <RoutePanel />
+        <RoutePanel onNavLog={() => setNavLogOpen(true)} />
         <InfoSheet />
+        {navLogOpen && <NavLogPanel onClose={() => setNavLogOpen(false)} />}
       </main>
       <DisclaimerBar />
       <DisclaimerModal />

@@ -143,9 +143,38 @@ export interface Waypoint {
   refId?: string;
 }
 
+export interface RouteWind {
+  /** Direction the wind blows from, degrees TRUE (as forecast). */
+  fromDeg: number;
+  speedKt: number;
+}
+
 export interface Route {
   id: string;
   name: string;
   waypoints: Waypoint[];
+  /** Planned cruise altitude, ft AMSL. */
+  cruiseAltFt: number;
+  wind: RouteWind;
   updatedAt: string;
+}
+
+export type FuelUnit = 'L' | 'USG';
+
+export interface Aircraft {
+  id: string;
+  /** Free name, e.g. "Club C172". */
+  name: string;
+  /** Registration / call sign, e.g. "LZ-ABC" (used for the flight plan later). */
+  registration: string;
+  /** ICAO type designator, e.g. "C172" (flight plan item 9). */
+  icaoType: string;
+  tasKt: number;
+  /** Cruise fuel flow per hour in `fuelUnit`. */
+  fuelBurnPerHour: number;
+  usableFuel: number;
+  taxiFuel: number;
+  /** Final reserve in minutes at cruise burn. */
+  reserveMinutes: number;
+  fuelUnit: FuelUnit;
 }

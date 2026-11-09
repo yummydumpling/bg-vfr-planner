@@ -43,3 +43,9 @@ export const IconDown = () => (
 export const IconPlus = () => (
   <svg {...base} width={18} height={18}><path d="M12 5v14M5 12h14" /></svg>
 );
+export const IconTable = () => (
+  <svg {...base}><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M3 14h18M9 9v11" /></svg>
+);
+export const IconEdit = () => (
+  <svg {...base} width={18} height={18}><path d="M4 20h4L19 9l-4-4L4 16v4Z" /><path d="m13 7 4 4" /></svg>
+);

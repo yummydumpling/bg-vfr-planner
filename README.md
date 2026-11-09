@@ -13,7 +13,7 @@ Bulgarian / English UI, mobile-first, dark mode, works offline after first load.
 | 1 | Navigation maths module (`src/nav`) + unit tests | ✅ done |
 | 2 | Map, airspace, airports, reporting points, info cards, BG/EN, dark mode, offline PWA | ✅ done |
 | 3 | Route planning: tap to add (snaps to aerodromes/points/navaids), drag to move, + to insert, reorder, delete, reverse, undo | ✅ done |
-| 4 | Nav log + aircraft profiles | — |
+| 4 | Nav log (TT, VAR, MT, WCA, MH, GS, ETE, fuel per leg + totals with reserve), aircraft profiles, wind & cruise altitude | ✅ done |
 | 5 | Airspace crossing list | — |
 | 6 | ICAO Item 15 generator | — |
 | 7 | METAR / TAF | — |
