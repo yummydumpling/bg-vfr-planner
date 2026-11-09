@@ -64,6 +64,28 @@ export const en = {
   channel: 'Channel',
   frequency: 'Frequency',
 
+  // route
+  route: 'Route',
+  planRoute: 'Plan route',
+  done: 'Done',
+  undo: 'Undo',
+  reverse: 'Reverse',
+  clear: 'Clear',
+  fitRoute: 'Show whole route',
+  addToRoute: 'Add to route',
+  addedToRoute: 'Added to route as point',
+  routeHintTitle: 'Tap the map to add waypoints',
+  routeHint: 'Tapping near an aerodrome, reporting point or navaid snaps to it. Drag a numbered point to move it, tap or drag a + to insert a point in a leg.',
+  routeEmpty: 'No waypoints yet.',
+  waypoints: 'waypoints',
+  deleteWp: 'Delete waypoint',
+  moveUp: 'Move up',
+  moveDown: 'Move down',
+  collapse: 'Collapse',
+  expand: 'Expand',
+  userPoint: 'User point',
+  wpKind: { user: 'User point', airport: 'Aerodrome', reporting: 'Reporting point', navaid: 'Navaid' },
+
   surface: {
     ASPHALT: 'Asphalt', CONCRETE: 'Concrete', GRASS: 'Grass', SAND: 'Sand', WATER: 'Water',
     GRAVEL: 'Gravel', EARTH: 'Earth', OTHER: 'Other', UNKNOWN: 'Unknown surface',

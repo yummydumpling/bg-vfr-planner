@@ -200,3 +200,88 @@ button { font: inherit; color: inherit; }
 .ck-D, .ck-ALERT, .ck-WARNING { border-left-color: var(--as-d); }
 .ck-TRA, .ck-TSA, .ck-MTA { border-left-color: var(--as-tra); }
 .ck-TMZ, .ck-RMZ { border-left-color: var(--as-zone); }
+
+/* ---------- Route planning ---------- */
+:root { --route: #d6009a; --route-text: #ffffff; }
+:root[data-theme='dark'] { --route: #ff5cd6; --route-text: #0b0f14; }
+
+.fab {
+  position: absolute; right: 12px; bottom: 34px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px;
+  border: 0; border-radius: 999px; background: var(--route); color: var(--route-text);
+  font-weight: 700; font-size: 15px; box-shadow: var(--shadow); cursor: pointer;
+}
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px;
+  border: 2px solid var(--route); border-radius: 12px; background: transparent; color: var(--route);
+  font-weight: 700; cursor: pointer;
+}
+.add-to-route { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 14px 0 4px; }
+
+.route-panel {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  max-height: 40%; display: flex; flex-direction: column;
+  background: var(--surface); border-radius: 16px 16px 0 0; box-shadow: var(--shadow);
+  border-top: 4px solid var(--route);
+}
+.route-panel.collapsed { max-height: none; }
+@media (min-width: 760px) {
+  .route-panel { left: auto; right: 12px; bottom: 34px; width: 420px; max-height: 60%; border-radius: 16px; }
+}
+.route-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  padding: 6px max(10px, env(safe-area-inset-right)) 6px max(12px, env(safe-area-inset-left));
+}
+.route-title {
+  display: flex; flex-direction: column; align-items: flex-start; border: 0; background: none;
+  padding: 4px 2px; cursor: pointer; text-align: left; min-width: 0;
+}
+.route-title .muted { font-size: 12.5px; white-space: nowrap; }
+.route-actions { display: flex; align-items: center; gap: 0; }
+.btn-icon.sm { min-width: 40px; height: 40px; padding: 0 6px; }
+.btn-icon.xs { min-width: 34px; height: 34px; padding: 0 4px; }
+.btn-icon:disabled { opacity: 0.35; cursor: default; }
+.btn-icon.danger { color: #e03131; }
+.btn-done {
+  min-height: 40px; padding: 0 14px; margin-left: 4px; border: 0; border-radius: 10px;
+  background: var(--route); color: var(--route-text); font-weight: 700; cursor: pointer;
+}
+.route-hint { padding: 0 16px 8px; font-size: 13.5px; color: var(--muted); }
+.route-hint strong { color: var(--text); }
+.route-hint p { margin: 4px 0 0; line-height: 1.4; }
+.wp-list {
+  list-style: none; margin: 0; padding: 0 max(8px, env(safe-area-inset-right)) 10px max(8px, env(safe-area-inset-left));
+  overflow: auto; -webkit-overflow-scrolling: touch;
+}
+.wp-list li { border-radius: 10px; }
+.wp-list li.selected { background: color-mix(in srgb, var(--route) 14%, transparent); }
+.wp-row { display: flex; align-items: center; gap: 10px; padding: 4px 6px; cursor: pointer; }
+.wp-num {
+  flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--route); color: var(--route-text); font-weight: 800; font-size: 13px;
+}
+.wp-num.first, .wp-num.last { border-radius: 7px; }
+.wp-name { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.wp-name > :first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wp-btns { display: flex; flex: none; }
+.leg-row {
+  display: flex; gap: 16px; padding: 0 6px 4px 44px; font-size: 13px; color: var(--route); font-weight: 600;
+}
+
+/* Map markers */
+.wp-marker {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--route); color: var(--route-text); border: 3px solid var(--surface);
+  font: 800 13px/1 var(--font); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45); cursor: pointer;
+  touch-action: none;
+}
+.wp-marker.wp-first, .wp-marker.wp-last { border-radius: 8px; }
+.wp-marker.wp-selected { outline: 3px solid #ffd43b; outline-offset: 1px; }
+.map-planning .wp-marker { width: 34px; height: 34px; font-size: 14px; cursor: grab; }
+.leg-handle {
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--surface); color: var(--route); border: 2.5px solid var(--route);
+  font: 800 18px/1 var(--font); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); cursor: grab; opacity: 0.92;
+  touch-action: none;
+}
+.leg-handle-active { background: var(--route); color: var(--route-text); }

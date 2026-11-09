@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Lang } from '../i18n';
+import { safeStorage } from './safeStorage';
 
 export type Theme = 'light' | 'dark';
 
@@ -33,13 +34,6 @@ interface SettingsState {
 }
 
 export const DISCLAIMER_VERSION = 1;
-
-/** localStorage can be unavailable (private mode, blocked storage) — never crash. */
-const safeStorage: StateStorage = {
-  getItem: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
-  setItem: (k, v) => { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
-  removeItem: (k) => { try { localStorage.removeItem(k); } catch { /* ignore */ } },
-};
 
 const prefersDark = () => {
   try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch { return false; }

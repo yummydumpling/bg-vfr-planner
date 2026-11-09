@@ -1,12 +1,37 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { airspaceBadge, formatLimit, formatVariation, pairRunways } from '../domain/format';
 import type { Airport, AirspaceProps, Navaid, ReportingPoint } from '../domain/types';
 import { useT } from '../i18n';
 import type { Dict } from '../i18n/en';
 import { formatDMS } from '../nav/coords';
 import { magneticVariation } from '../nav/magvar/wmm';
+import { waypointFromFeature, type PointKind } from '../route/fromData';
+import { makeWaypoint } from '../route/ops';
 import { useData } from '../store/data';
-import { IconClose, IconExternal } from './icons';
+import { useRoute } from '../store/route';
+import { IconClose, IconExternal, IconPlus } from './icons';
+
+/** Append this aerodrome / point / navaid to the working route. */
+function AddToRoute({ kind, id, t }: { kind: PointKind; id: string; t: Dict }) {
+  const data = useData((s) => s.data);
+  const [addedAs, setAddedAs] = useState<number | null>(null);
+  const add = () => {
+    if (!data) return;
+    const wp = waypointFromFeature(data, kind, id);
+    if (!wp) return;
+    const route = useRoute.getState();
+    route.add(makeWaypoint(wp));
+    setAddedAs(useRoute.getState().route.waypoints.length);
+  };
+  return (
+    <div className="add-to-route">
+      <button className="btn-secondary" onClick={add}>
+        <IconPlus /> {t.addToRoute}
+      </button>
+      {addedAs != null && <span className="muted small" role="status">{t.addedToRoute} {addedAs}</span>}
+    </div>
+  );
+}
 
 export function InfoSheet() {
   const t = useT();
@@ -29,13 +54,13 @@ export function InfoSheet() {
   let body: React.ReactNode = null;
   if (selection.kind === 'airport') {
     const a = index.airports.get(selection.id);
-    if (a) body = <AirportCard a={a} t={t} />;
+    if (a) body = <><AirportCard a={a} t={t} /><AddToRoute key={a.id} kind="airport" id={a.id} t={t} /></>;
   } else if (selection.kind === 'reporting') {
     const p = index.rps.get(selection.id);
-    if (p) body = <ReportingCard p={p} t={t} />;
+    if (p) body = <><ReportingCard p={p} t={t} /><AddToRoute key={p.id} kind="reporting" id={p.id} t={t} /></>;
   } else if (selection.kind === 'navaid') {
     const n = index.navaids.get(selection.id);
-    if (n) body = <NavaidCard n={n} t={t} />;
+    if (n) body = <><NavaidCard n={n} t={t} /><AddToRoute key={n.id} kind="navaid" id={n.id} t={t} /></>;
   } else {
     const list = selection.ids.map((id) => index.airspaces.get(id)).filter((x): x is AirspaceProps => !!x);
     body = <AirspaceList list={list} lat={selection.lat} lon={selection.lon} t={t} />;

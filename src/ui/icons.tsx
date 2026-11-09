@@ -19,3 +19,27 @@ export const IconWarning = () => (
 export const IconExternal = () => (
   <svg {...base} width={14} height={14}><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg>
 );
+export const IconRoute = () => (
+  <svg {...base}><circle cx="5" cy="18" r="2.5" /><circle cx="19" cy="6" r="2.5" /><path d="M7.5 17.5c6-1 2-9 9-10.5" strokeDasharray="0" /></svg>
+);
+export const IconUndo = () => (
+  <svg {...base} width={20} height={20}><path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" /></svg>
+);
+export const IconReverse = () => (
+  <svg {...base} width={20} height={20}><path d="M7 4v16M7 4 3 8M7 4l4 4" /><path d="M17 20V4M17 20l-4-4M17 20l4-4" /></svg>
+);
+export const IconTrash = () => (
+  <svg {...base} width={20} height={20}><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+);
+export const IconFit = () => (
+  <svg {...base} width={20} height={20}><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+);
+export const IconUp = () => (
+  <svg {...base} width={18} height={18}><path d="m6 15 6-6 6 6" /></svg>
+);
+export const IconDown = () => (
+  <svg {...base} width={18} height={18}><path d="m6 9 6 6 6-6" /></svg>
+);
+export const IconPlus = () => (
+  <svg {...base} width={18} height={18}><path d="M12 5v14M5 12h14" /></svg>
+);

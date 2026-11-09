@@ -129,3 +129,23 @@ export interface DatasetMeta {
   countries: string[];
   counts: Record<string, number>;
 }
+
+export type WaypointKind = 'user' | 'airport' | 'reporting' | 'navaid';
+
+export interface Waypoint {
+  id: string;
+  lat: number;
+  lon: number;
+  /** Display name: ICAO code, reporting point name, navaid ident or coordinates. */
+  name: string;
+  kind: WaypointKind;
+  /** Id of the source object (airport/reporting point/navaid) when snapped. */
+  refId?: string;
+}
+
+export interface Route {
+  id: string;
+  name: string;
+  waypoints: Waypoint[];
+  updatedAt: string;
+}

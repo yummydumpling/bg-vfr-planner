@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useT } from './i18n';
 import { MapView } from './map/MapView';
 import { useData } from './store/data';
+import { useRoute } from './store/route';
 import { useSettings } from './store/settings';
 import { DisclaimerBar, DisclaimerModal } from './ui/Disclaimer';
 import { InfoSheet } from './ui/InfoSheet';
 import { LayersPanel } from './ui/LayersPanel';
+import { RouteButton, RoutePanel } from './ui/RoutePanel';
 import { TopBar } from './ui/TopBar';
 
 export default function App() {
@@ -16,6 +18,12 @@ export default function App() {
   const loaded = useData((s) => !!s.data);
   const error = useData((s) => s.error);
   const [layersOpen, setLayersOpen] = useState(false);
+  const planning = useRoute((s) => s.planning);
+
+  // Entering planning mode: taps add waypoints, so close any info card.
+  useEffect(() => {
+    if (planning) useData.getState().select(null);
+  }, [planning]);
 
   useEffect(() => {
     void load();
@@ -35,6 +43,8 @@ export default function App() {
         {!loaded && !error && <div className="toast">{t.loading}</div>}
         {error && <div className="toast error">{t.loadError} ({error})</div>}
         {layersOpen && <LayersPanel onClose={() => setLayersOpen(false)} />}
+        <RouteButton />
+        <RoutePanel />
         <InfoSheet />
       </main>
       <DisclaimerBar />

@@ -4,23 +4,59 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useRef } from 'react';
 import { airspacesAt } from '../airspace/query';
+import type { Waypoint } from '../domain/types';
+import { waypointFromFeature, type PointKind } from '../route/fromData';
+import { makeWaypoint, userWaypoint } from '../route/ops';
 import { useData } from '../store/data';
+import { useRoute } from '../store/route';
 import { useSettings, type LayerKey } from '../store/settings';
 import { BASE_STYLES, LAYER_IDS, addAeroLayers, setHighlightedAirspaces, updateLayerVisibility } from './layers';
+import { setMapInstance } from './mapInstance';
+import { addRouteLayers, updateRouteLayers } from './routeLayer';
+import { RouteMarkers } from './routeMarkers';
 
 /** Bulgaria with a little margin [W, S, E, N]. */
 const BG_BOUNDS: [number, number, number, number] = [22.3, 41.2, 28.7, 44.25];
-const TAP_TOLERANCE_PX = 12;
+/** Finger-friendly hit radius for symbols and snapping. */
+const TAP_TOLERANCE_PX = 14;
 
 maplibregl.setWorkerUrl(maplibreWorkerUrl);
+
+const INTERACTIVE = [LAYER_IDS.airports, LAYER_IDS.reporting, LAYER_IDS.navaids];
+const KIND_BY_LAYER: Record<string, PointKind> = {
+  [LAYER_IDS.airports]: 'airport',
+  [LAYER_IDS.reporting]: 'reporting',
+  [LAYER_IDS.navaids]: 'navaid',
+};
+
+/** Nearest aerodrome / reporting point / navaid symbol to a screen point. */
+function featureAt(map: maplibregl.Map, point: maplibregl.Point): { kind: PointKind; id: string } | null {
+  const layers = INTERACTIVE.filter((id) => map.getLayer(id));
+  if (!layers.length) return null;
+  const t = TAP_TOLERANCE_PX;
+  const hits = map.queryRenderedFeatures([[point.x - t, point.y - t], [point.x + t, point.y + t]], { layers });
+  if (!hits.length) return null;
+  const nearest = hits
+    .map((f) => {
+      const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
+      const p = map.project([lon, lat]);
+      return { f, d2: (p.x - point.x) ** 2 + (p.y - point.y) ** 2 };
+    })
+    .sort((a, b) => a.d2 - b.d2)[0].f;
+  return { kind: KIND_BY_LAYER[nearest.layer.id], id: String(nearest.properties?.id) };
+}
 
 export function MapView() {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const markersRef = useRef<RouteMarkers | null>(null);
   const theme = useSettings((s) => s.theme);
   const layers = useSettings((s) => s.layers);
   const data = useData((s) => s.data);
   const selection = useData((s) => s.selection);
+  const waypoints = useRoute((s) => s.route.waypoints);
+  const planning = useRoute((s) => s.planning);
+  const selectedWp = useRoute((s) => s.selectedWp);
 
   // Latest values for map event handlers
   const live = useRef({ theme, layers, data });
@@ -46,10 +82,35 @@ export function MapView() {
     );
     map.addControl(new maplibregl.ScaleControl({ unit: 'nautical' }), 'bottom-left');
 
+    /** Snap a screen point to a nearby aerodrome/point, if any. */
+    const snapAt = (point: maplibregl.Point): Omit<Waypoint, 'id'> | null => {
+      const d = live.current.data;
+      const hit = d && featureAt(map, point);
+      return hit && d ? waypointFromFeature(d, hit.kind, hit.id) : null;
+    };
+
+    const markers = new RouteMarkers(map, {
+      onPreview: (wps) => updateRouteLayers(map, wps),
+      onMoveEnd: (id, at) => {
+        const snapped = snapAt(map.project(at));
+        useRoute.getState().move(id, { lat: at.lat, lon: at.lng }, snapped ?? undefined);
+      },
+      onInsertEnd: (index, at) => {
+        const snapped = snapAt(map.project(at));
+        const wp = snapped ? makeWaypoint(snapped) : userWaypoint({ lat: at.lat, lon: at.lng });
+        useRoute.getState().add(wp, index);
+        useRoute.getState().selectWp(wp.id);
+      },
+      onTapWaypoint: (id) => useRoute.getState().selectWp(id),
+    });
+    markersRef.current = markers;
+
     const addOverlays = () => {
       const { data: d, theme: t, layers: l } = live.current;
       if (!d) return;
       addAeroLayers(map, d, t, l);
+      addRouteLayers(map, t);
+      updateRouteLayers(map, useRoute.getState().route.waypoints);
       const sel = useData.getState().selection;
       setHighlightedAirspaces(map, sel?.kind === 'airspaces' ? sel.ids : []);
     };
@@ -59,28 +120,24 @@ export function MapView() {
       if (window.innerWidth < 760) container.current?.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
     });
 
-    const interactive = [LAYER_IDS.airports, LAYER_IDS.reporting, LAYER_IDS.navaids];
     map.on('click', (e) => {
       const { data: d, layers: l } = live.current;
-      if (!d) return;
-      const present = interactive.filter((id) => map.getLayer(id));
-      const { x, y } = e.point;
-      const hits = map.queryRenderedFeatures(
-        [[x - TAP_TOLERANCE_PX, y - TAP_TOLERANCE_PX], [x + TAP_TOLERANCE_PX, y + TAP_TOLERANCE_PX]],
-        { layers: present },
-      );
-      if (hits.length) {
-        // nearest symbol to the tap
-        const nearest = hits
-          .map((f) => {
-            const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
-            const p = map.project([lon, lat]);
-            return { f, d2: (p.x - x) ** 2 + (p.y - y) ** 2 };
-          })
-          .sort((a, b) => a.d2 - b.d2)[0].f;
-        const id = String(nearest.properties?.id);
-        const kind = nearest.layer.id === LAYER_IDS.airports ? 'airport' : nearest.layer.id === LAYER_IDS.reporting ? 'reporting' : 'navaid';
-        useData.getState().select({ kind, id });
+      if (!d || markers.isDragging) return;
+      // Taps on route markers/handles are handled by the markers themselves
+      if ((e.originalEvent.target as HTMLElement | null)?.closest?.('.maplibregl-marker')) return;
+
+      const route = useRoute.getState();
+      if (route.planning) {
+        const snapped = snapAt(e.point);
+        const wp = snapped ? makeWaypoint(snapped) : userWaypoint({ lat: e.lngLat.lat, lon: e.lngLat.lng });
+        route.add(wp);
+        route.selectWp(wp.id);
+        return;
+      }
+
+      const hit = featureAt(map, e.point);
+      if (hit) {
+        useData.getState().select(hit);
         return;
       }
       const { lat, lng } = e.lngLat;
@@ -88,15 +145,19 @@ export function MapView() {
       useData.getState().select({ kind: 'airspaces', lat, lon: lng, ids: found.map((a) => a.id) });
     });
 
-    for (const id of interactive) {
+    for (const id of INTERACTIVE) {
       map.on('mouseenter', id, () => (map.getCanvas().style.cursor = 'pointer'));
       map.on('mouseleave', id, () => (map.getCanvas().style.cursor = ''));
     }
 
     mapRef.current = map;
+    setMapInstance(map);
     // Dev-only hook for automated UI checks
     if (import.meta.env.DEV) (window as unknown as { __bgvfrMap?: maplibregl.Map }).__bgvfrMap = map;
     return () => {
+      markers.destroy();
+      markersRef.current = null;
+      setMapInstance(null);
       map.remove();
       mapRef.current = null;
     };
@@ -105,9 +166,27 @@ export function MapView() {
   // Data arrived after the style loaded
   useEffect(() => {
     const map = mapRef.current;
-    if (map && data && map.isStyleLoaded()) addAeroLayers(map, data, theme, layers);
+    if (map && data && map.isStyleLoaded()) {
+      addAeroLayers(map, data, theme, layers);
+      addRouteLayers(map, theme);
+      updateRouteLayers(map, useRoute.getState().route.waypoints);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
+  // Route changed → redraw line and markers
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    updateRouteLayers(map, waypoints);
+    markersRef.current?.sync(waypoints, planning, selectedWp);
+  }, [waypoints, planning, selectedWp]);
+
+  // Crosshair cursor while planning (desktop)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map) map.getCanvas().style.cursor = planning ? 'crosshair' : '';
+  }, [planning]);
 
   // Theme → swap base style (overlays are re-added on style.load)
   const firstTheme = useRef(theme);
@@ -128,5 +207,5 @@ export function MapView() {
     setHighlightedAirspaces(map, selection?.kind === 'airspaces' ? selection.ids : []);
   }, [selection, theme]);
 
-  return <div ref={container} className="map" role="application" aria-label="Map" />;
+  return <div ref={container} className={`map${planning ? ' map-planning' : ''}`} role="application" aria-label="Map" />;
 }
