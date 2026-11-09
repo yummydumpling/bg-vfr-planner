@@ -14,6 +14,8 @@ import { BASE_STYLES, LAYER_IDS, addAeroLayers, setHighlightedAirspaces, updateL
 import { revealPoint } from './focus';
 import { setMapInstance } from './mapInstance';
 import { addRouteLayers, updateRouteLayers } from './routeLayer';
+import { addOwnshipLayers, updateOwnship } from './ownship';
+import { useInflight } from '../store/inflight';
 import { RouteMarkers } from './routeMarkers';
 
 /** Bulgaria with a little margin [W, S, E, N]. */
@@ -135,6 +137,9 @@ export function MapView() {
       addAeroLayers(map, d, t, l);
       addRouteLayers(map, t);
       updateRouteLayers(map, useRoute.getState().route.waypoints);
+      addOwnshipLayers(map, t);
+      const inf = useInflight.getState();
+      if (inf.active) updateOwnship(map, inf.fix, inf.trail);
       setHighlightedAirspaces(map, highlightFor(useData.getState().selection));
     };
     addOverlaysRef.current = addOverlays;
@@ -173,6 +178,11 @@ export function MapView() {
       revealPoint(lat, lng);
     });
 
+    // Panning by hand while flying stops "follow aircraft".
+    map.on('dragstart', () => {
+      if (useInflight.getState().active) useInflight.getState().setFollow(false);
+    });
+
     for (const id of INTERACTIVE) {
       map.on('mouseenter', id, () => (map.getCanvas().style.cursor = 'pointer'));
       map.on('mouseleave', id, () => (map.getCanvas().style.cursor = ''));
@@ -190,6 +200,35 @@ export function MapView() {
       mapRef.current = null;
     };
   }, []);
+
+  // In-flight: own-ship symbol, flown track and follow camera
+  useEffect(
+    () =>
+      useInflight.subscribe((s, prev) => {
+        const map = mapRef.current;
+        if (!map) return;
+        if (!s.active) {
+          if (prev.active) updateOwnship(map, null, []);
+          return;
+        }
+        if (s.fix === prev.fix && s.follow === prev.follow) return;
+        updateOwnship(map, s.fix, s.trail);
+        if (s.follow && s.fix) {
+          // Centre the aircraft in the part of the map not covered by the instrument strip/bottom bar.
+          const top = (document.querySelector('.if-top') as HTMLElement | null)?.offsetHeight ?? 0;
+          const bottom = (document.querySelector('.if-bottom') as HTMLElement | null)?.offsetHeight ?? 0;
+          const zoomIn = !prev.fix || s.follow !== prev.follow;
+          map.easeTo({
+            center: [s.fix.lon, s.fix.lat],
+            offset: [0, (top - bottom) / 2],
+            zoom: zoomIn ? Math.max(map.getZoom(), 9.5) : map.getZoom(),
+            duration: zoomIn ? 600 : 900,
+            essential: true,
+          });
+        }
+      }),
+    [],
+  );
 
   // Data arrived after the style loaded (overlay adding is idempotent)
   useEffect(() => {

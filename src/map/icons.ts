@@ -114,6 +114,25 @@ const ICONS: Record<string, Draw> = {
       c.moveTo(C + 6, C - 6); c.lineTo(C - 6, C + 6);
     });
   },
+  // Own aircraft: arrow pointing north, rotated by the map to the track.
+  ownship: (c) => {
+    const path = () => {
+      c.beginPath();
+      c.moveTo(C, C - 13);
+      c.lineTo(C + 9, C + 11);
+      c.lineTo(C, C + 6);
+      c.lineTo(C - 9, C + 11);
+      c.closePath();
+    };
+    c.lineJoin = 'round';
+    c.strokeStyle = '#000';
+    c.lineWidth = 4;
+    path();
+    c.stroke();
+    c.fillStyle = '#ffd43b';
+    path();
+    c.fill();
+  },
   'rp-comp': (c, ink) => triangle(c, ink, true),
   'rp-req': (c, ink) => triangle(c, ink, false),
   'nav-vor': (c, ink) => hexagon(c, ink),

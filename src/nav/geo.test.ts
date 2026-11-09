@@ -77,3 +77,18 @@ describe('great circle', () => {
     for (let i = 1; i < pts.length; i++) expect(distanceNm(pts[i - 1], pts[i])).toBeLessThanOrEqual(5);
   });
 });
+
+describe('cross-track / along-track', () => {
+  const a = { lat: 0, lon: 0 };
+  const b = { lat: 0, lon: 2 };
+  const oneDeg = (Math.PI / 180) * EARTH_RADIUS_NM;
+  it('right of an eastbound course is south', async () => {
+    const { crossTrackNm, alongTrackNm } = await import('./geo');
+    expect(crossTrackNm(a, b, { lat: -0.1, lon: 1 })).toBeCloseTo(0.1 * oneDeg, 3);
+    expect(crossTrackNm(a, b, { lat: 0.1, lon: 1 })).toBeCloseTo(-0.1 * oneDeg, 3);
+    expect(crossTrackNm(a, b, { lat: 0, lon: 1.5 })).toBeCloseTo(0, 9);
+    expect(alongTrackNm(a, b, { lat: 0.1, lon: 1 })).toBeCloseTo(oneDeg, 2);
+    expect(alongTrackNm(a, b, { lat: 0, lon: -0.5 })).toBeCloseTo(-0.5 * oneDeg, 3);
+    expect(alongTrackNm(a, b, { lat: 0, lon: 2.5 })).toBeCloseTo(2.5 * oneDeg, 3);
+  });
+});

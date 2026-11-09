@@ -52,3 +52,6 @@ export const IconEdit = () => (
 export const IconFolder = () => (
   <svg {...base}><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" /></svg>
 );
+export const IconPlane = () => (
+  <svg {...base}><path d="M12 2c.8 0 1.4.7 1.4 1.6V9l7.6 4.4v2l-7.6-2.3v4.6l2.2 1.7V21L12 20l-3.6 1v-1.6l2.2-1.7v-4.6L3 15.4v-2L10.6 9V3.6C10.6 2.7 11.2 2 12 2Z" /></svg>
+);

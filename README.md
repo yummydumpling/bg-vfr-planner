@@ -17,6 +17,7 @@ Bulgarian / English UI, mobile-first, dark mode, works offline after first load.
 | 5 | Airspace crossing list (entry/exit NM, limits vs cruise altitude, tap to show on map) | ✅ done |
 | 6 | ICAO flight plan (items 7–19, per-field copy for B-FLIP, full FPL message), share, print/PDF, pilot details | ✅ done |
 | 7 | METAR / TAF (Weather tab + aerodrome cards, report age, offline cache) via Cloudflare Worker proxy | ✅ done |
+| 9 | In-flight mode: GPS (or Bluetooth GNSS via the phone), own-ship + flown track, GS/TRK/ALT, next waypoint DIST/BRG/ETE, off-course, ETA, auto leg sequencing, airspace inside/ahead, simulator, screen kept awake | ✅ done |
 | 8 | Route library (IndexedDB: save, open, rename, copy, delete), GPX export/import with aerodrome/point/navaid recognition | ✅ done |
 
 ## Setup

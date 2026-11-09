@@ -5,6 +5,8 @@ import { useData } from './store/data';
 import { useRoute } from './store/route';
 import { useSettings } from './store/settings';
 import { DisclaimerBar, DisclaimerModal } from './ui/Disclaimer';
+import { FlyButton, InFlightPanel } from './ui/InFlightPanel';
+import { useInflight } from './store/inflight';
 import { InfoSheet } from './ui/InfoSheet';
 import { LayersPanel } from './ui/LayersPanel';
 import { NavLogPanel } from './ui/NavLogPanel';
@@ -38,6 +40,7 @@ export default function App() {
     };
   }, [printing]);
   const planning = useRoute((s) => s.planning);
+  const flying = useInflight((s) => s.active);
 
   // Entering planning mode: taps add waypoints, so close any info card.
   useEffect(() => {
@@ -57,14 +60,16 @@ export default function App() {
   return (
     <div className="app">
       <TopBar onLayers={() => setLayersOpen((o) => !o)} onNavLog={() => { setRoutesOpen(false); setNavLogOpen((o) => !o); }} onRoutes={() => { setNavLogOpen(false); setRoutesOpen((o) => !o); }} />
-      <main className="main">
+      <main className={`main${flying ? ' flying' : ''}`}>
         <MapView />
         <UpdateBar />
         {!loaded && !error && <div className="toast">{t.loading}</div>}
         {error && <div className="toast error">{t.loadError} ({error})</div>}
         {layersOpen && <LayersPanel onClose={() => setLayersOpen(false)} />}
-        <RouteButton />
-        <RoutePanel onNavLog={() => setNavLogOpen(true)} />
+        {!flying && <RouteButton />}
+        {!flying && <FlyButton />}
+        {!flying && <RoutePanel onNavLog={() => setNavLogOpen(true)} />}
+        <InFlightPanel />
         <InfoSheet />
         {routesOpen && <RoutesPanel onClose={() => setRoutesOpen(false)} />}
         {navLogOpen && <NavLogPanel onClose={() => setNavLogOpen(false)} onPrint={() => setPrinting(true)} />}

@@ -105,3 +105,28 @@ export function densify(a: LatLon, b: LatLon, maxStepNm = 1): LatLon[] {
   for (let i = 0; i <= steps; i++) out.push(intermediatePoint(a, b, i / steps));
   return out;
 }
+
+/**
+ * Cross-track distance of point p from the great circle a→b, NM.
+ * Positive = right of course, negative = left.
+ */
+export function crossTrackNm(a: LatLon, b: LatLon, p: LatLon): number {
+  const d13 = distanceNm(a, p) / EARTH_RADIUS_NM;
+  const θ13 = toRad(initialBearing(a, p));
+  const θ12 = toRad(initialBearing(a, b));
+  return Math.asin(Math.sin(d13) * Math.sin(θ13 - θ12)) * EARTH_RADIUS_NM;
+}
+
+/**
+ * Along-track distance from a of the point on a→b closest to p, NM
+ * (negative when p is "behind" a).
+ */
+export function alongTrackNm(a: LatLon, b: LatLon, p: LatLon): number {
+  const d13 = distanceNm(a, p) / EARTH_RADIUS_NM;
+  const dxt = crossTrackNm(a, b, p) / EARTH_RADIUS_NM;
+  const c = Math.cos(d13) / Math.cos(dxt);
+  const atd = Math.acos(Math.max(-1, Math.min(1, c))) * EARTH_RADIUS_NM;
+  const θ13 = toRad(initialBearing(a, p));
+  const θ12 = toRad(initialBearing(a, b));
+  return Math.cos(θ13 - θ12) >= 0 ? atd : -atd;
+}
