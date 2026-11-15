@@ -268,6 +268,9 @@ export const en = {
   flyNote: 'Keep the app open: phones stop GPS updates in the background. The screen is kept on while flying (where the phone allows). GPS altitude is approximate (±100 ft) — always use your altimeter.',
   noRouteFly: 'Without a route only position, speed and track are shown.',
   legOf: 'leg',
+  dataLabel: 'Airspace data',
+  dataOutdated: 'OUTDATED',
+  dataAgeHint: 'Date of the aeronautical data (airspace, aerodromes, points) built into the app. Tap for details.',
   surface: {
     ASPHALT: 'Asphalt', CONCRETE: 'Concrete', GRASS: 'Grass', SAND: 'Sand', WATER: 'Water',
     GRAVEL: 'Gravel', EARTH: 'Earth', OTHER: 'Other', UNKNOWN: 'Unknown surface',

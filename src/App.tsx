@@ -4,6 +4,7 @@ import { MapView } from './map/MapView';
 import { useData } from './store/data';
 import { useRoute } from './store/route';
 import { useSettings } from './store/settings';
+import { DataAgeBadge } from './ui/DataAgeBadge';
 import { DisclaimerBar, DisclaimerModal } from './ui/Disclaimer';
 import { FlyButton, InFlightPanel } from './ui/InFlightPanel';
 import { useInflight } from './store/inflight';
@@ -66,6 +67,7 @@ export default function App() {
         {!loaded && !error && <div className="toast">{t.loading}</div>}
         {error && <div className="toast error">{t.loadError} ({error})</div>}
         {layersOpen && <LayersPanel onClose={() => setLayersOpen(false)} />}
+        {!flying && !planning && <DataAgeBadge onOpen={() => setLayersOpen(true)} />}
         {!flying && <RouteButton />}
         {!flying && <FlyButton />}
         {!flying && <RoutePanel onNavLog={() => setNavLogOpen(true)} />}

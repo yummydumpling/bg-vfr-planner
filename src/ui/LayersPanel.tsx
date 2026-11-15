@@ -1,3 +1,4 @@
+import { dataAgeDays, formatDataDate, relativeDays } from '../domain/dataAge';
 import { useT } from '../i18n';
 import { useData } from '../store/data';
 import { useSettings, type LayerKey } from '../store/settings';
@@ -20,6 +21,7 @@ export function LayersPanel({ onClose }: { onClose: () => void }) {
   const layers = useSettings((s) => s.layers);
   const toggle = useSettings((s) => s.toggleLayer);
   const meta = useData((s) => s.data?.meta);
+  const lang = useSettings((s) => s.lang);
   return (
     <aside className="panel" aria-label={t.layers}>
       <div className="panel-head">
@@ -43,7 +45,7 @@ export function LayersPanel({ onClose }: { onClose: () => void }) {
           <li>
             {t.dataSource}: <a href="https://www.openaip.net" target="_blank" rel="noopener">openAIP</a>{' '}
             (<a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>)
-            {meta && <> — {t.dataFetched} {meta.fetchedAt.slice(0, 10)}</>}
+            {meta && <> — {t.dataFetched} <strong>{formatDataDate(meta.fetchedAt, lang)}</strong> ({relativeDays(dataAgeDays(meta.fetchedAt), lang)})</>}
           </li>
           <li>
             Map: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> ©{' '}
