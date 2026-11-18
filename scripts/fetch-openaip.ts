@@ -7,7 +7,7 @@
  * The key is only used here, at build time; it is never shipped to browsers.
  * openAIP data © openAIP contributors, CC BY-NC 4.0 — https://www.openaip.net
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { DatasetMeta } from '../src/domain/types';
@@ -101,35 +101,60 @@ async function main() {
   // airports outside the box, so resolve against everything we downloaded.
   const icaoById = new Map(airports.filter((a) => a.icaoCode).map((a) => [a._id, a.icaoCode!]));
 
-  const airspaceFc: GeoJSON.FeatureCollection = {
-    type: 'FeatureCollection',
-    features: airspaces.map(normalizeAirspace),
-  };
-  const out = {
+  // Stable order so an unchanged dataset produces identical files.
+  const byId = <T extends { id: string }>(a: T, b: T) => a.id.localeCompare(b.id);
+  const airspaceFeatures = airspaces.map(normalizeAirspace).sort((a, b) => a.properties.id.localeCompare(b.properties.id));
+  const airspaceFc: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: airspaceFeatures };
+  const out: Record<string, unknown> = {
     'airspaces.geojson': airspaceFc,
-    'airports.json': airports.map(normalizeAirport).sort((a, b) => a.name.localeCompare(b.name)),
-    'reporting-points.json': rps.map((p) => normalizeReportingPoint(p, icaoById)),
-    'navaids.json': navaids.map(normalizeNavaid),
+    'airports.json': airports.map(normalizeAirport).sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id)),
+    'reporting-points.json': rps.map((p) => normalizeReportingPoint(p, icaoById)).sort(byId),
+    'navaids.json': navaids.map(normalizeNavaid).sort(byId),
   };
-  for (const [file, data] of Object.entries(out)) writeFileSync(resolve(OUT, file), JSON.stringify(data));
+  const counts = {
+    airspaces: airspaceFeatures.length,
+    airports: (out['airports.json'] as unknown[]).length,
+    reportingPoints: (out['reporting-points.json'] as unknown[]).length,
+    navaids: (out['navaids.json'] as unknown[]).length,
+  };
 
-  const meta: DatasetMeta = {
-    source: 'openAIP',
-    sourceUrl: 'https://www.openaip.net',
-    licence: 'CC BY-NC 4.0',
-    licenceUrl: 'https://creativecommons.org/licenses/by-nc/4.0/',
-    attribution: '© openAIP contributors (openaip.net), CC BY-NC 4.0',
-    fetchedAt: new Date().toISOString(),
-    countries,
-    counts: {
-      airspaces: airspaceFc.features.length,
-      airports: out['airports.json'].length,
-      reportingPoints: out['reporting-points.json'].length,
-      navaids: out['navaids.json'].length,
-    },
-  };
-  writeFileSync(resolve(OUT, 'meta.json'), JSON.stringify(meta, null, 2));
-  console.log('Wrote', OUT, meta.counts);
+  // Safety net: an API hiccup must never replace good data with a near-empty set.
+  const metaFile = resolve(OUT, 'meta.json');
+  const previous = existsSync(metaFile) ? (JSON.parse(readFileSync(metaFile, 'utf8')) as DatasetMeta) : null;
+  for (const [k, n] of Object.entries(counts)) {
+    const before = previous?.counts?.[k] ?? 0;
+    if (n === 0 || (before > 0 && n < before * 0.8)) {
+      throw new Error(`Suspicious data: ${k} ${before} → ${n}. Not updating.`);
+    }
+  }
+
+  let changed = false;
+  for (const [file, data] of Object.entries(out)) {
+    const path = resolve(OUT, file);
+    const text = JSON.stringify(data);
+    if (!existsSync(path) || readFileSync(path, 'utf8') !== text) {
+      writeFileSync(path, text);
+      changed = true;
+    }
+  }
+
+  if (changed || !previous) {
+    const meta: DatasetMeta = {
+      source: 'openAIP',
+      sourceUrl: 'https://www.openaip.net',
+      licence: 'CC BY-NC 4.0',
+      licenceUrl: 'https://creativecommons.org/licenses/by-nc/4.0/',
+      attribution: '© openAIP contributors (openaip.net), CC BY-NC 4.0',
+      // When the data last changed (the daily check time is published separately in status.json)
+      fetchedAt: new Date().toISOString(),
+      countries,
+      counts,
+    };
+    writeFileSync(metaFile, JSON.stringify(meta, null, 2));
+  }
+  console.log(changed ? 'Data CHANGED' : 'Data unchanged', counts);
+  // Tell GitHub Actions whether to commit and publish new data
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `changed=${changed}\n`);
 }
 
 main().catch((e) => {

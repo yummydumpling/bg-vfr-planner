@@ -5,9 +5,13 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string };
-const commit = (() => {
-  try { return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return 'dev'; }
-})();
+const git = (args: string, fallback: string) => {
+  try { return execSync(`git ${args}`, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() || fallback; } catch { return fallback; }
+};
+const commit = git('rev-parse --short HEAD', 'dev');
+// Commit time (not "now") so rebuilding the same commit gives identical files —
+// the daily data check can redeploy without making every phone download an update.
+const buildTime = new Date(git('log -1 --format=%cI', new Date().toISOString())).toISOString();
 
 // BASE_PATH lets the same build run at a sub-path (e.g. GitHub Pages: /bg-vfr-planner/).
 const base = process.env.BASE_PATH ?? '/';
@@ -16,7 +20,7 @@ export default defineConfig({
   base,
   define: {
     __APP_VERSION__: JSON.stringify(`${pkg.version}+${commit}`),
-    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    __BUILD_TIME__: JSON.stringify(buildTime),
   },
   server: {
     host: true,
@@ -31,6 +35,12 @@ export default defineConfig({
     },
   },
   worker: { format: 'es' },
+  build: {
+    rollupOptions: {
+      // The app plus the static privacy notice and terms of use
+      input: { main: 'index.html', privacy: 'privacy.html', terms: 'terms.html' },
+    },
+  },
   preview: { host: true },
   plugins: [
     react(),
@@ -62,8 +72,17 @@ export default defineConfig({
         skipWaiting: true,
         // App shell + bundled aeronautical data are precached → works offline.
         globPatterns: ['**/*.{js,css,html,png,svg,json,geojson,webmanifest}'],
+        // status.json changes daily (data check time) and must not trigger an app update
+        globIgnores: ['**/status.json'],
+        navigateFallbackDenylist: [/\/(privacy|terms)\.html$/],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         runtimeCaching: [
+          {
+            // Daily data-check status: fresh when online, last known when offline
+            urlPattern: /\/data\/bg\/status\.json$/,
+            handler: 'NetworkFirst',
+            options: { cacheName: 'data-status', networkTimeoutSeconds: 4 },
+          },
           {
             // Base-map style, fonts and sprites
             urlPattern: /^https:\/\/tiles\.openfreemap\.org\/(styles|fonts|sprites)\//,

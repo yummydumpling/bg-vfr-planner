@@ -7,8 +7,14 @@ export type Selection =
   | { kind: 'navaid'; id: string }
   | { kind: 'airspaces'; lat: number; lon: number; ids: string[]; focusId?: string };
 
+/** Published daily by the data-refresh job (not precached, so it stays current online). */
+export interface DataStatus {
+  checkedAt: string;
+}
+
 interface DataState {
   data: AeroData | null;
+  status: DataStatus | null;
   error: string | null;
   selection: Selection | null;
   load: (source?: AeroDataSource) => Promise<void>;
@@ -19,6 +25,7 @@ interface DataState {
 
 export const useData = create<DataState>()((set, get) => ({
   data: null,
+  status: null,
   error: null,
   selection: null,
   load: async (source = new BundledSnapshotSource()) => {
@@ -27,6 +34,16 @@ export const useData = create<DataState>()((set, get) => ({
       set({ data: await source.load(), error: null });
     } catch (e) {
       set({ error: e instanceof Error ? e.message : String(e) });
+    }
+    // Optional: when the data was last checked against openAIP
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}data/bg/status.json`, { cache: 'no-store' });
+      if (res.ok) {
+        const st = (await res.json()) as Partial<DataStatus>;
+        if (st.checkedAt && !Number.isNaN(Date.parse(st.checkedAt))) set({ status: { checkedAt: st.checkedAt } });
+      }
+    } catch {
+      /* offline or not published yet */
     }
   },
   select: (selection) => set({ selection }),

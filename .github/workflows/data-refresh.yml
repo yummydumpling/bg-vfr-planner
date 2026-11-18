@@ -1,0 +1,66 @@
+name: Daily data refresh
+
+# Downloads the openAIP data every day. New data is tested, committed and
+# published; otherwise only the "checked" time is updated (no app update for users).
+# Needs the repository secret OPENAIP_API_KEY.
+on:
+  schedule:
+    - cron: '23 3 * * *' # 03:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    outputs:
+      checked_at: ${{ steps.when.outputs.checked_at }}
+      changed: ${{ steps.fetch.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - id: when
+        run: echo "checked_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Download openAIP data
+        id: fetch
+        env:
+          OPENAIP_API_KEY: ${{ secrets.OPENAIP_API_KEY }}
+        run: |
+          if [ -z "$OPENAIP_API_KEY" ]; then
+            echo "::error::Add the repository secret OPENAIP_API_KEY (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          npm run data:fetch
+
+      - name: Test with the new data
+        if: steps.fetch.outputs.changed == 'true'
+        run: npx vitest run
+
+      - name: Commit new data
+        if: steps.fetch.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/bg
+          git commit -m "Update openAIP data ($(date -u +%Y-%m-%d))"
+          git push
+
+  deploy:
+    needs: refresh
+    uses: ./.github/workflows/deploy.yml
+    with:
+      checked_at: ${{ needs.refresh.outputs.checked_at }}
+    secrets: inherit

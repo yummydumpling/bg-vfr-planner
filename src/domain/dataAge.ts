@@ -15,6 +15,14 @@ export function dataAgeLevel(days: number): DataAgeLevel {
   return days <= AIRAC_DAYS ? 'fresh' : days <= 2 * AIRAC_DAYS ? 'aging' : 'outdated';
 }
 
+/**
+ * With a daily automatic check, freshness depends on when the data was last
+ * *checked*: a missed check or two is fine, a week means the job is broken.
+ */
+export function checkAgeLevel(daysSinceCheck: number): DataAgeLevel {
+  return daysSinceCheck <= 3 ? 'fresh' : daysSinceCheck <= AIRAC_DAYS ? 'aging' : 'outdated';
+}
+
 /** "today", "yesterday", "6 days ago" / "днес", "вчера", "преди 6 дни". */
 export function relativeDays(days: number, lang: string): string {
   try {

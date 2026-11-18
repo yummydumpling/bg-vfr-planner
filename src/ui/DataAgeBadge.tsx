@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { dataAgeDays, dataAgeLevel, formatDataDate, relativeDays } from '../domain/dataAge';
+import { checkAgeLevel, dataAgeDays, dataAgeLevel, formatDataDate, relativeDays } from '../domain/dataAge';
 import { useT } from '../i18n';
 import { useData } from '../store/data';
 import { useSettings } from '../store/settings';
@@ -9,6 +9,7 @@ export function DataAgeBadge({ onOpen }: { onOpen: () => void }) {
   const t = useT();
   const lang = useSettings((s) => s.lang);
   const fetchedAt = useData((s) => s.data?.meta.fetchedAt);
+  const checkedAt = useData((s) => s.status?.checkedAt);
   // re-evaluate "N days ago" once an hour while the app stays open
   const [, tick] = useState(0);
   useEffect(() => {
@@ -17,6 +18,16 @@ export function DataAgeBadge({ onOpen }: { onOpen: () => void }) {
   }, []);
   if (!fetchedAt) return null;
   const days = dataAgeDays(fetchedAt);
+  if (checkedAt) {
+    const checkedDays = dataAgeDays(checkedAt);
+    const level = checkAgeLevel(checkedDays);
+    return (
+      <button className={`data-age age-${level}`} onClick={onOpen} title={t.dataAgeHint} aria-label={t.dataAgeHint}>
+        {t.dataLabel}: {t.dataChanged} <strong>{formatDataDate(fetchedAt, lang)}</strong> · {t.dataChecked} {relativeDays(checkedDays, lang)}
+        {level === 'outdated' && <strong> · {t.dataOutdated}</strong>}
+      </button>
+    );
+  }
   const level = dataAgeLevel(days);
   return (
     <button className={`data-age age-${level}`} onClick={onOpen} title={t.dataAgeHint} aria-label={t.dataAgeHint}>

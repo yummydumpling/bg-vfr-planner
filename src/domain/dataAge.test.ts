@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dataAgeDays, dataAgeLevel, formatDataDate, relativeDays } from './dataAge';
+import { checkAgeLevel, dataAgeDays, dataAgeLevel, formatDataDate, relativeDays } from './dataAge';
 
 const fetched = '2026-11-09T09:32:05.843Z';
 
@@ -15,6 +15,12 @@ describe('data age', () => {
     expect(dataAgeLevel(29)).toBe('aging');
     expect(dataAgeLevel(56)).toBe('aging');
     expect(dataAgeLevel(57)).toBe('outdated');
+  });
+  it('daily-check levels', () => {
+    expect(checkAgeLevel(0)).toBe('fresh');
+    expect(checkAgeLevel(3)).toBe('fresh');
+    expect(checkAgeLevel(4)).toBe('aging');
+    expect(checkAgeLevel(29)).toBe('outdated');
   });
   it('localised wording', () => {
     expect(relativeDays(0, 'en')).toBe('today');

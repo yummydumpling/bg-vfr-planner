@@ -588,3 +588,13 @@ table.navlog tfoot .sticky-col { background: var(--surface-2); }
 .credit-line { margin: 0 0 6px; color: var(--text); font-size: 14px; line-height: 1.5; }
 .credits .btn-secondary { text-decoration: none; font-size: 14px; min-height: 40px; }
 .modal-credit { text-align: center; margin: 12px 0 0; }
+
+/* ---------- What's new / crash screen ---------- */
+.wn-release h3 { margin: 14px 0 4px; font-size: 16px; }
+.wn-release ul { margin: 0 0 8px; padding-left: 20px; line-height: 1.5; font-size: 14.5px; }
+.btn-text.inline-link { min-height: 0; padding: 0; font: inherit; color: var(--primary); text-decoration: underline; }
+.crash { position: fixed; inset: 0; display: grid; place-items: center; padding: 16px; background: var(--bg); color: var(--text); }
+.crash-box { max-width: 520px; width: 100%; }
+.crash-box h1 { font-size: 22px; }
+.crash-box pre { white-space: pre-wrap; word-break: break-word; background: var(--surface-2); padding: 10px; border-radius: 10px; font: 13px var(--mono); }
+.crash-box .btn-secondary { text-decoration: none; }

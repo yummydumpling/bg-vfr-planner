@@ -61,6 +61,18 @@ If you are behind an HTTP proxy, run it with `NODE_USE_ENV_PROXY=1` (Node ≥ 22
 The script downloads Bulgaria plus neighbouring airspace/aerodromes near the border
 (RO, RS, MK, GR, TR) and writes normalised JSON.
 
+## Automation (GitHub Actions)
+
+| Workflow | When | What |
+|---|---|---|
+| `.github/workflows/deploy.yml` | every push to `main`, manual, or called by the data refresh | unit tests → type check + build → publish `dist/` to the `gh-pages` branch (GitHub Pages) |
+| `.github/workflows/data-refresh.yml` | daily 03:23 UTC, manual | download openAIP data; if it changed: test, commit, publish; always publish `data/bg/status.json` with the check time |
+| `.github/dependabot.yml` | weekly / monthly | dependency and GitHub Actions update pull requests |
+
+Setup: repository secret **`OPENAIP_API_KEY`** (Settings → Secrets and variables → Actions).
+Builds are reproducible (build time = commit time) and `status.json` is not precached, so a daily
+"nothing changed" deploy does not make installed apps download an update.
+
 ## Navigation maths (`src/nav`)
 
 | File | Purpose |

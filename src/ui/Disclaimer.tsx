@@ -31,7 +31,9 @@ export function DisclaimerModal() {
         <h2 id="disc-title"><IconWarning /> {t.disclaimerTitle}</h2>
         <p>{t.disclaimerBody}</p>
         <button className="btn-primary" onClick={accept} autoFocus>{t.disclaimerAccept}</button>
-        <p className="muted small modal-credit">{APP_COPYRIGHT}</p>
+        <p className="muted small modal-credit">
+          {APP_COPYRIGHT} · <a href={`${import.meta.env.BASE_URL}terms.html#${lang}`} target="_blank" rel="noopener">{t.terms}</a> · <a href={`${import.meta.env.BASE_URL}privacy.html#${lang}`} target="_blank" rel="noopener">{t.privacy}</a>
+        </p>
       </div>
     </div>
   );

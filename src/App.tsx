@@ -5,6 +5,7 @@ import { useData } from './store/data';
 import { useRoute } from './store/route';
 import { useSettings } from './store/settings';
 import { DataAgeBadge } from './ui/DataAgeBadge';
+import { WhatsNewAfterUpdate } from './ui/WhatsNew';
 import { DisclaimerBar, DisclaimerModal } from './ui/Disclaimer';
 import { FlyButton, InFlightPanel } from './ui/InFlightPanel';
 import { useInflight } from './store/inflight';
@@ -16,6 +17,11 @@ import { RouteButton, RoutePanel } from './ui/RoutePanel';
 import { RoutesPanel } from './ui/RoutesPanel';
 import { TopBar } from './ui/TopBar';
 import { UpdateBar } from './ui/UpdateBar';
+
+/** Dev-only: open /?crashtest to check the error screen. */
+function CrashTest(): null {
+  throw new Error('Crash test (development only)');
+}
 
 export default function App() {
   const t = useT();
@@ -78,6 +84,8 @@ export default function App() {
       </main>
       <DisclaimerBar />
       <DisclaimerModal />
+      <WhatsNewAfterUpdate />
+      {import.meta.env.DEV && location.search.includes('crashtest') && <CrashTest />}
       {printing && <PrintView />}
     </div>
   );

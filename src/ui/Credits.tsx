@@ -3,6 +3,7 @@ import { APP_AUTHOR, APP_COPYRIGHT, APP_NAME, APP_URL, CONTACT_EMAIL, feedbackMa
 import { useT } from '../i18n';
 import { useSettings } from '../store/settings';
 import { shareText } from './share';
+import { WhatsNewLink } from './WhatsNew';
 
 /** Share the app link — opens the phone's share sheet (Messenger, WhatsApp…) or copies the link. */
 export function ShareAppButton({ className = 'btn-secondary' }: { className?: string }) {
@@ -40,6 +41,8 @@ export function Credits() {
         <br />
         <span className="muted small">
           {APP_COPYRIGHT} · {t.licenceLbl}: <a href={LICENSE_URL} target="_blank" rel="noopener">PolyForm Noncommercial 1.0.0</a>
+          <br />
+          <a href={`${import.meta.env.BASE_URL}privacy.html#${lang}`} target="_blank" rel="noopener">{t.privacy}</a> · <a href={`${import.meta.env.BASE_URL}terms.html#${lang}`} target="_blank" rel="noopener">{t.terms}</a> · <WhatsNewLink />
         </span>
       </p>
       <div className="fpl-actions">
