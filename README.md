@@ -1,5 +1,9 @@
 # BG VFR Planner
 
+Created by **Vincent Marchewka** · © 2026 · Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE) — free for personal and other non-commercial use; commercial rights reserved. Third-party data and libraries: see [NOTICE.md](NOTICE.md).
+
+**Open the app:** https://yummydumpling.github.io/bg-vfr-planner/
+
 An original VFR flight-planning Progressive Web App for pilots flying in Bulgaria.
 Bulgarian / English UI, mobile-first, dark mode, works offline after first load.
 
@@ -84,4 +88,9 @@ unit-agnostic (litres or US gal, whichever the aircraft profile uses).
 
 ## Licence
 
-All code in this repository is original. (Project licence: TBD by the owner.)
+Copyright © 2026 Vincent Marchewka. Source code licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+The bundled openAIP data is CC BY-NC 4.0 and other third-party components keep their own licences — see [NOTICE.md](NOTICE.md).
+
+### Feedback/contact address in the app
+
+The app's "Feedback & contact" button uses `VITE_CONTACT_EMAIL` from `.env.production` (hidden when unset).

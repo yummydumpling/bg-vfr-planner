@@ -582,3 +582,9 @@ table.navlog tfoot .sticky-col { background: var(--surface-2); }
 .data-age.age-aging strong { color: #5c3c00; }
 .data-age.age-outdated { background: #c92a2a; color: #fff; border-color: #c92a2a; }
 .data-age.age-outdated strong { color: #fff; }
+
+/* ---------- Credits ---------- */
+.credits { padding: 10px 0 2px; }
+.credit-line { margin: 0 0 6px; color: var(--text); font-size: 14px; line-height: 1.5; }
+.credits .btn-secondary { text-decoration: none; font-size: 14px; min-height: 40px; }
+.modal-credit { text-align: center; margin: 12px 0 0; }

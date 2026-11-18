@@ -1,3 +1,4 @@
+import { APP_COPYRIGHT } from '../config/app';
 import { useT } from '../i18n';
 import { DISCLAIMER_VERSION, useSettings } from '../store/settings';
 import { IconWarning } from './icons';
@@ -30,6 +31,7 @@ export function DisclaimerModal() {
         <h2 id="disc-title"><IconWarning /> {t.disclaimerTitle}</h2>
         <p>{t.disclaimerBody}</p>
         <button className="btn-primary" onClick={accept} autoFocus>{t.disclaimerAccept}</button>
+        <p className="muted small modal-credit">{APP_COPYRIGHT}</p>
       </div>
     </div>
   );

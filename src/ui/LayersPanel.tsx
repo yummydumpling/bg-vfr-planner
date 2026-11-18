@@ -2,6 +2,7 @@ import { dataAgeDays, formatDataDate, relativeDays } from '../domain/dataAge';
 import { useT } from '../i18n';
 import { useData } from '../store/data';
 import { useSettings, type LayerKey } from '../store/settings';
+import { Credits } from './Credits';
 import { IconClose } from './icons';
 
 const ROWS: { key: LayerKey; label: (t: ReturnType<typeof useT>) => string; swatch: string }[] = [
@@ -40,6 +41,7 @@ export function LayersPanel({ onClose }: { onClose: () => void }) {
         ))}
       </ul>
       <section className="about">
+        <Credits />
         <h3>{t.about}</h3>
         <ul>
           <li>

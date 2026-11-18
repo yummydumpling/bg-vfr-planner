@@ -271,6 +271,13 @@ export const en = {
   dataLabel: 'Airspace data',
   dataOutdated: 'OUTDATED',
   dataAgeHint: 'Date of the aeronautical data (airspace, aerodromes, points) built into the app. Tap for details.',
+  // credits & sharing
+  createdBy: 'Created by',
+  feedback: 'Feedback & contact',
+  shareApp: 'Share the app with friends',
+  shareAppText: 'BG VFR Planner — free VFR flight planning for Bulgaria: airspace, nav log, flight plan, METAR/TAF and in-flight GPS. Open the link and add it to your home screen.',
+  linkCopied: 'Link copied — paste it into Messenger',
+  licenceLbl: 'Licence',
   surface: {
     ASPHALT: 'Asphalt', CONCRETE: 'Concrete', GRASS: 'Grass', SAND: 'Sand', WATER: 'Water',
     GRAVEL: 'Gravel', EARTH: 'Earth', OTHER: 'Other', UNKNOWN: 'Unknown surface',
