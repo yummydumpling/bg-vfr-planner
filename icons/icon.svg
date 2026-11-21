@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0b2545"/>
+  <path d="M96 380 L200 236 L312 300 L416 132" fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 0"/>
+  <circle cx="96" cy="380" r="30" fill="#0b2545" stroke="#ffffff" stroke-width="20"/>
+  <circle cx="200" cy="236" r="24" fill="#ffffff"/>
+  <circle cx="312" cy="300" r="24" fill="#ffffff"/>
+  <path d="M416 92 L452 168 L380 168 Z" fill="#f59f00"/>
+  <text x="256" y="470" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="6">BG VFR</text>
+</svg>

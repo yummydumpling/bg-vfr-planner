@@ -1,0 +1,22 @@
+{
+  "source": "openAIP",
+  "sourceUrl": "https://www.openaip.net",
+  "licence": "CC BY-NC 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-nc/4.0/",
+  "attribution": "© openAIP contributors (openaip.net), CC BY-NC 4.0",
+  "fetchedAt": "2026-11-09T09:32:05.843Z",
+  "countries": [
+    "BG",
+    "RO",
+    "RS",
+    "MK",
+    "GR",
+    "TR"
+  ],
+  "counts": {
+    "airspaces": 470,
+    "airports": 121,
+    "reportingPoints": 99,
+    "navaids": 27
+  }
+}
